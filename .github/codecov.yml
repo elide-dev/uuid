@@ -1,0 +1,22 @@
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "25...40"
+  status:
+    project:
+      default:
+        informational: true
+    patch: off
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: false
+
+github_checks:
+  annotations: true

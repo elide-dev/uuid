@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.20-beta1] - 2023-04-28
+### Changed
+- Codebase refactor and cleanup (fork)
+- Upgrade to Kotlin 1.8.20
+- Remove deprecated targets
+- Devops upgrades and fixes
+
 ## [0.7.0] - 2023-02-25
 ### Changed
 - Add support for linuxArm64 (#134)

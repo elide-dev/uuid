@@ -1,0 +1,120 @@
+name: "Build"
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      label:
+        required: true
+        type: string
+      flags:
+        required: false
+        type: string
+        default: "--no-configuration-cache"
+      gvm:
+        required: false
+        type: string
+        default: "22.3.1"
+      java:
+        required: false
+        type: string
+        default: "19"
+      coverage:
+        required: false
+        type: boolean
+        default: true
+      experimental:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      SONAR_TOKEN:
+        required: true
+      CODECOV_TOKEN:
+        required: true
+      BUILDLESS_APIKEY:
+        required: true
+
+env:
+  CI: "true"
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-XX:+UseParallelGC -Xmx3g -XX:MetaspaceSize=512M -XX:MaxMetaspaceSize=512M"
+  GRADLE_CACHE_LOCAL: true
+  GRADLE_CACHE_REMOTE: true
+  GRADLE_CACHE_PUSH: true
+  GRADLE_CACHE_USERNAME: apikey
+  GRADLE_CACHE_PASSWORD: ${{ secrets.BUILDLESS_APIKEY }}
+  CACHE_ENDPOINT: https://gradle.less.build/cache/generic/
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  TEST_EXCEPTIONS: true
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+    name: "Compile and Test"
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+      checks: "write"
+      pull-requests: "write"
+
+    steps:
+      - name: "Setup: Checkout"
+        uses: actions/checkout@v3
+      - name: "Setup: Cache"
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+          path: |
+            ~/.sonar/cache
+            ~/.konan
+            ~/.gradle/caches
+      - name: "Setup: GraalVM"
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: 22.3.1
+          java-version: '19'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Build and Test"
+        uses: gradle/gradle-build-action@v2
+        id: gradlebuild
+        continue-on-error: ${{ inputs.experimental }}
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta' }}
+          gradle-version: wrapper
+          gradle-home-cache-cleanup: true
+          gradle-home-cache-includes: |
+            caches
+            notifications
+            jdks
+          gradle-home-cache-excludes: |
+            caches/build-cache-1
+            caches/keyrings
+          arguments: |
+            preMerge
+            --scan
+            --no-daemon
+            --warning-mode=none
+            --dependency-verification=lenient
+            -Pci=true
+            ${{ inputs.flags }}
+      - name: "Analysis: Build Reports"
+        uses: actions/upload-artifact@v3
+        if: failure() || success()
+        with:
+          name: reports
+          path: |
+            build/api/
+            build/reports/
+            build/test-results/
+      - name: "Analysis: Coverage"
+        if: ${{ inputs.coverage }}
+        uses: codecov/codecov-action@v3

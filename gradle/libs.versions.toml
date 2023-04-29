@@ -1,0 +1,27 @@
+[versions]
+kotlin = "1.8.20"
+kover = "0.6.1"
+kotlinx_benchmark = "0.4.7"
+kotlinx_apiValidator = "0.12.1"
+ktlint = "0.42.1"
+detekt = "1.22.0-RC3"
+sonar = "4.0.0.2929"
+dokka = "1.8.10"
+doctor = "0.8.1"
+versionCheck = "0.46.0"
+
+[plugins]
+doctor = { id = "com.osacky.doctor", version.ref = "doctor" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kotlin_multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinx_benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx_benchmark" }
+kotlinx_apiValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx_apiValidator" }
+sonar = { id = "org.sonarqube", version.ref = "sonar" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck" }
+
+[libraries]
+ktlint = { group = "com.pinterest", name = "ktlint", version.ref = "ktlint" }
+
+[bundles]
