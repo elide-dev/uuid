@@ -1,4 +1,4 @@
-package com.benasher44.uuid
+package dev.elide.uuid
 
 import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.convert

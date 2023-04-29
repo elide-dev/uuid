@@ -1,4 +1,4 @@
-package com.benasher44.uuid
+package dev.elide.uuid
 
 import kotlin.native.FreezingIsDeprecated
 import kotlin.native.concurrent.freeze

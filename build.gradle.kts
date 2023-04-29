@@ -2,9 +2,15 @@
     "unused",
     "DSL_SCOPE_VIOLATION",
     "UNUSED_VARIABLE",
+    "PropertyName",
+)
+@file:OptIn(
+    org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class
 )
 
+import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -13,8 +19,10 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
+import java.net.URI
 
 plugins {
+    alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.doctor)
     alias(libs.plugins.dokka)
@@ -25,9 +33,10 @@ plugins {
     alias(libs.plugins.kotlinx.benchmark)
     alias(libs.plugins.kotlinx.apiValidator)
 
-    id("project-report")
-    id("maven-publish")
-    id("signing")
+    `project-report`
+    `maven-publish`
+    distribution
+    signing
 }
 
 val defaultJavaToolchain: Int = 11
@@ -36,6 +45,11 @@ val kotlinLanguage: String by properties
 val lockDeps: String by properties
 val nodeVersion: String by properties
 val sonarScan: String by properties
+val GROUP: String by properties
+val VERSION: String by properties
+
+group = GROUP
+version = VERSION
 
 val kotlinCompilerArgs = listOf(
     "-progressive",
@@ -57,15 +71,28 @@ val cacheDisabledTasks = listOf(
     "koverXmlReport",
 )
 
+val isReleaseBuild = !VERSION.contains("SNAPSHOT")
+
 repositories {
     maven("https://maven.pkg.st/")
+}
+
+testlogger {
+    theme = MOCHA_PARALLEL
+    showExceptions = System.getenv("TEST_EXCEPTIONS") == "true"
+    showFailed = true
+    showPassed = true
+    showSkipped = true
+    showFailedStandardStreams = true
+    showFullStackTraces = true
+    slowThreshold = 30000L
 }
 
 kotlin {
     explicitApi()
 
     targets {
-        js {
+        js(IR) {
             compilations.all {
                 kotlinOptions {
                     sourceMap = true
@@ -76,9 +103,15 @@ kotlin {
             browser()
             nodejs()
         }
+
+        wasm {
+            browser()
+        }
+
         jvm {
             jvmToolchain(jvmTargetMinimum.toIntOrNull() ?: defaultJavaToolchain)
         }
+
         if (HostManager.hostIsMac) {
             macosX64()
             macosArm64()
@@ -106,18 +139,39 @@ kotlin {
 
     sourceSets {
         val commonMain by getting
-        val commonTest by getting {
+        val commonTest by getting
+        val nonWasmMain by creating { dependsOn(commonMain) }
+        val nonWasmTest by creating {
+            dependsOn(commonTest)
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val nonJvmMain by creating { dependsOn(commonMain) }
-        val nonJvmTest by creating { dependsOn(commonTest) }
+        val nonJvmMain by creating {
+            dependsOn(nonWasmMain)
+        }
+        val nonJvmTest by creating {
+            dependsOn(nonWasmTest)
+        }
+        val jvmMain by getting { dependsOn(nonWasmMain) }
+        val jvmTest by getting { dependsOn(nonWasmTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
-        val nativeMain by creating { dependsOn(nonJvmMain) }
-        val nativeTest by creating { dependsOn(nonJvmTest) }
+        val nativeMain by creating {
+            dependsOn(nonJvmMain)
+            dependsOn(nonWasmMain)
+        }
+        val nativeTest by creating {
+            dependsOn(nonJvmTest)
+            dependsOn(nonWasmTest)
+        }
+        val wasmMain by getting {
+            dependsOn(commonMain)
+        }
+        val wasmTest by getting {
+            dependsOn(commonTest)
+        }
         val nix64Main by creating { dependsOn(nativeMain) }
         val nix64Test by creating { dependsOn(nativeTest) }
         val nix32Main by creating { dependsOn(nativeMain) }
@@ -183,22 +237,50 @@ kotlin {
         }
     }
 
+    sourceSets.all {
+        languageSettings.apply {
+            apiVersion = kotlinLanguage
+            languageVersion = kotlinLanguage
+            progressiveMode = true
+            optIn("kotlin.ExperimentalUnsignedTypes")
+        }
+    }
+
     targets.all {
         compilations.all {
             kotlinOptions {
                 apiVersion = kotlinLanguage
                 languageVersion = kotlinLanguage
                 allWarningsAsErrors = true
-                if (this is KotlinJvmOptions) {
-                    jvmTarget = jvmTargetMinimum
-                    javaParameters = true
-                    freeCompilerArgs = jvmFlags
-                } else {
-                    freeCompilerArgs = kotlinCompilerArgs
+                when (this) {
+                    is KotlinJvmOptions -> {
+                        jvmTarget = jvmTargetMinimum
+                        javaParameters = true
+                        freeCompilerArgs = jvmFlags
+                    }
+                    is KotlinJsOptions -> {
+                        sourceMap = true
+                        moduleKind = "umd"
+                        metaInfo = true
+                    }
+                    else -> {
+                        freeCompilerArgs = kotlinCompilerArgs
+                    }
                 }
             }
         }
     }
+}
+
+tasks.withType<Test>().configureEach {
+    maxParallelForks = 4
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = jvmTargetMinimum
+    targetCompatibility = jvmTargetMinimum
+    options.isFork = true
+    options.isIncremental = true
 }
 
 rootProject.plugins.withType(NodeJsRootPlugin::class.java) {
@@ -248,8 +330,6 @@ checkTask.configure {
     dependsOn(ktlint)
 }
 
-// apply(from = "publish.gradle")
-
 // Generate PROJECT_DIR_ROOT for referencing local mocks in tests
 
 val projectDirGenRoot = "$buildDir/generated/projectdir/kotlin"
@@ -260,11 +340,8 @@ val generateProjDirValTask: TaskProvider<Task> = tasks.register("generateProject
     projDirFile.writeText("")
     projDirFile.appendText(
         """
-            |package com.benasher44.uuid
+            |package dev.elide.uuid
             |
-            |import kotlin.native.concurrent.SharedImmutable
-            |
-            |@SharedImmutable
             |internal const val PROJECT_DIR_ROOT = ""${'"'}${projectDirPath}""${'"'}
             |
         """.trimMargin()
@@ -285,6 +362,30 @@ tasks.withType<AbstractCompile>().configureEach {
 tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
     if (name.lowercase().contains("test")) {
         dependsOn(generateProjDirValTask)
+    }
+}
+
+tasks.withType<Jar>().configureEach {
+    isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+}
+
+tasks.withType<Zip>().configureEach {
+    isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+}
+
+configurations.all {
+    resolutionStrategy {
+        // fail eagerly on version conflict (includes transitive dependencies)
+        failOnVersionConflict()
+
+        // prefer modules that are part of this build
+        preferProjectModules()
+
+        if (name.contains("detached")) {
+            disableDependencyVerification()
+        }
     }
 }
 
@@ -324,13 +425,13 @@ plugins.withType(io.gitlab.arturbosch.detekt.DetektPlugin::class) {
     }
 }
 
-tasks.withType<DokkaTask> {
-    dokkaSourceSets {
-        register("main") {
-            samples.from("src/commonTest/kotlin")
-        }
-    }
-}
+//tasks.withType<DokkaTask> {
+//    dokkaSourceSets {
+//        named("commonMain") {
+//            samples.from("src/commonTest/kotlin")
+//        }
+//    }
+//}
 
 if (lockDeps == "true") {
     dependencyLocking {
@@ -355,6 +456,75 @@ tasks.register("relock") {
         tasks.dependencies,
         resolveAndLockAll,
     )
+}
+
+val dokkaHtml by tasks.getting(DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(tasks.dokkaHtml)
+    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
+}
+
+val mavenUsername: String? = properties["mavenUsername"] as? String
+val mavenPassword: String? = properties["mavenPassword"] as? String
+
+signing {
+    isRequired = isReleaseBuild
+    sign(configurations.archives.get())
+    sign(publishing.publications)
+}
+
+tasks.withType(Sign::class) {
+    onlyIf {
+        isReleaseBuild
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication> {
+        artifact(javadocJar)
+        artifactId = artifactId.replace("uuid", "elide-uuid")
+
+        pom {
+            name.set("Elide UUID")
+            url.set("https://elide.dev")
+            description.set("UUID tools for Kotlin Multiplatform.")
+
+            licenses {
+                license {
+                    name.set("MIT License")
+                    url.set("https://github.com/elide-dev/elide/blob/v3/LICENSE")
+                }
+            }
+            developers {
+                developer {
+                    id.set("sgammon")
+                    name.set("Sam Gammon")
+                    email.set("samuel.gammon@gmail.com")
+                }
+            }
+            scm {
+                url.set("https://github.com/elide-dev/elide")
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = URI.create(if (isReleaseBuild) {
+                "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            } else {
+                "gcs://elide-snapshots/repository/v3"
+            })
+            if (!mavenUsername.isNullOrBlank() && !mavenPassword.isNullOrBlank()) {
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
+            }
+        }
+    }
 }
 
 val reports: TaskProvider<Task> = tasks.register("reports") {
@@ -395,6 +565,15 @@ tasks.create("preMerge") {
 }
 
 afterEvaluate {
+    listOf(
+        "wasmTest",
+        "compileTestDevelopmentExecutableKotlinWasm",
+    ).forEach {
+        tasks.named(it).configure {
+            enabled = false
+        }
+    }
+
     cacheDisabledTasks.forEach {
         try {
             tasks.named(it).configure {
@@ -404,4 +583,38 @@ afterEvaluate {
             // ignore
         }
     }
+}
+
+val publishMac by tasks.registering {
+    dependsOn(
+        "publishIosArm64PublicationToMavenRepository",
+        "publishIosSimulatorArm64PublicationToMavenRepository",
+        "publishIosX64PublicationToMavenRepository",
+        "publishTvosArm64PublicationToMavenRepository",
+        "publishTvosSimulatorArm64PublicationToMavenRepository",
+        "publishTvosX64PublicationToMavenRepository",
+        "publishWatchosArm32PublicationToMavenRepository",
+        "publishWatchosArm64PublicationToMavenRepository",
+        "publishWatchosSimulatorArm64PublicationToMavenRepository",
+        "publishWatchosX64PublicationToMavenRepository",
+        "publishMacosArm64PublicationToMavenRepository",
+        "publishMacosX64PublicationToMavenRepository",
+        "publishJvmPublicationToMavenRepository",
+        "publishJsPublicationToMavenRepository",
+        "publishWasmPublicationToMavenRepository",
+        "publishKotlinMultiplatformPublicationToMavenRepository",
+    )
+}
+
+val publishWindows by tasks.registering {
+    dependsOn(
+        "publishMingwX64PublicationToMavenRepository",
+    )
+}
+
+val publishLinux by tasks.registering {
+    dependsOn(
+        "publishLinuxX64PublicationToMavenRepository",
+        "publishLinuxArm64PublicationToMavenRepository",
+    )
 }
