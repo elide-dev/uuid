@@ -1,0 +1,48 @@
+{
+  "name": "buildless",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "netbeans.jdkhome": "/usr/lib/gvm",
+    "java.completion.enabled": true,
+    "java.debug.settings.enableRunDebugCodeLens": true,
+    "java.test.editor.enableShortcuts": true
+  },
+  "runArgs": ["--init", "--privileged"],
+  "overrideCommand": false,
+  "extensions": [
+    "asf.apache-netbeans-java",
+    "bazelbuild.vscode-bazel",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "mathiasfrohlich.kotlin",
+    "github.codespaces",
+    "github.copilot",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "redhat.vscode-yaml",
+    "naco-siren.gradle-language",
+    "vscjava.vscode-gradle",
+    "bufbuild.vscode-buf",
+    "sswg.swift-lang",
+    "fwcd.kotlin",
+    "sourcegraph.sourcegraph",
+    "oracle-labs-graalvm.graalvm",
+    "oracle-labs-graalvm.graalvm-pack",
+    "oracle-labs-graalvm.micronaut",
+    "oracle-labs-graalvm.dashboard"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/go:1": { "version": "1.19" },
+    "ghcr.io/devcontainers/features/sshd:1": { "version": "latest" },
+    "ghcr.io/devcontainers/features/docker-from-docker:1": {},
+    "ghcr.io/tailscale/codespace/tailscale": {}
+  },
+  "updateContentCommand": "./gradlew dependencies --refresh-dependencies && ./gradlew tasks && git checkout kotlin-js-store || exit 0",
+  "forwardPorts": [8080, 50051],
+  "remoteUser": "dev"
+}

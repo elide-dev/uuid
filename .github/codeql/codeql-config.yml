@@ -1,0 +1,12 @@
+name: "CodeQL"
+
+languages: java
+
+queries:
+  - uses: security-and-quality
+
+packs:
+  - codeql/java-queries
+
+paths:
+  - src

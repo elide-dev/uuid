@@ -1,47 +1,120 @@
-name: pr
+name: PR
 
 on:
   pull_request:
     branches:
       - master
+      - beta
+
+env:
+  CI: "true"
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-XX:+UseParallelGC -Xmx3g -XX:MetaspaceSize=512M -XX:MaxMetaspaceSize=512M"
+  GRADLE_CACHE_LOCAL: true
+  GRADLE_CACHE_REMOTE: true
+  GRADLE_CACHE_PUSH: true
+  GRADLE_CACHE_USERNAME: apikey
+  GRADLE_CACHE_PASSWORD: ${{ secrets.BUILDLESS_APIKEY }}
+  CACHE_ENDPOINT: ${{ vars.CACHE_ENDPOINT_GRADLE }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  TEST_EXCEPTIONS: true
 
 jobs:
   build:
+    name: "Build (${{ matrix.label }})"
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+      checks: "write"
+      pull-requests: "write"
+
     strategy:
+      fail-fast: false
       matrix:
-        os: [macOS-latest, windows-latest, ubuntu-latest]
-    runs-on: ${{matrix.os}}
+        runner: [macOS-latest, windows-latest-8-cores, ubuntu-latest-4-cores]
+        include:
+          - runner: macOS-latest
+            flags: "--no-configuration-cache"
+            os: "macos"
+            label: "Darwin"
+            experimental: false
+            coverage: true
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+          - runner: windows-latest-8-cores
+            flags: "--no-configuration-cache"
+            os: "windows"
+            label: "Windows"
+            experimental: false
+            coverage: true
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+          - runner: ubuntu-latest-4-cores
+            flags: "--no-configuration-cache -PsonarScan=true"
+            os: "linux"
+            label: "Linux"
+            experimental: false
+            coverage: true
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+
+    uses: ./.github/workflows/step.build.yml
+    secrets: inherit
+    with:
+      runner: ${{ matrix.runner }}
+      os: ${{ matrix.os }}
+      label: ${{ matrix.label }}
+      flags: ${{ matrix.flags }}
+      experimental: ${{ matrix.experimental }}
+      gvm: ${{ matrix.gvm }}
+      java: ${{ matrix.java }}
+      coverage: ${{ matrix.coverage }}
+
+  codeql:
+    name: "Analysis: CodeQL"
+    needs: ["build"]
+    uses: ./.github/workflows/codeql.ci.yml
+    secrets: inherit
+    with: {}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+  qodana:
+    name: "Analysis: Qodana"
+    needs: ["build"]
+    uses: ./.github/workflows/qodana.ci.yml
+    with: {}
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+  review:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    name: "Analysis: Auto-Review"
+    needs: ["build"]
+    continue-on-error: true
     steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v2
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: Cache gradle
-        uses: actions/cache@v2
+      - name: "Setup: Checkout"
+        uses: actions/checkout@v3
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Cache konan
-        uses: actions/cache@v2
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+      - name: "Auto PR Review"
+        uses: microsoft/gpt-review@0.1.2
+        continue-on-error: true
         with:
-          path: ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: List Tasks
-        run: ./gradlew tasks --no-daemon --stacktrace
-
-       # ktlint
-
-      - name: ktlint
-        if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew ktlint --no-daemon --stacktrace
-
-      - name: Build
-        run: ./gradlew build --no-daemon --stacktrace
-
-env:
-  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
+          GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ORG_KEY: ${{ secrets.OPENAI_ORG_ID }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPOSITORY_NAME: ${{ github.repository }}
+          AZURE_OPENAI_API: ${{ secrets.AZURE_OPENAI_API }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}

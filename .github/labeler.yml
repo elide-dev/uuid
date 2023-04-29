@@ -1,0 +1,2 @@
+"dependencies":
+  - any: ["gradle/libs.versions.toml", "package.json", "**/package.json"]

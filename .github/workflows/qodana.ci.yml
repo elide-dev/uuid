@@ -1,0 +1,34 @@
+name: Qodana
+
+on:
+  workflow_dispatch: {}
+  workflow_call: {}
+  push:
+    branches:
+      - master
+      - main
+      - 'releases/*'
+
+env:
+  CI: "true"
+  GRADLE_OPTS: -Dorg.gradle.jvmargs="-XX:+UseParallelGC -Xmx3g -XX:MetaspaceSize=512M -XX:MaxMetaspaceSize=512M"
+  GRADLE_CACHE_LOCAL: true
+  GRADLE_CACHE_REMOTE: true
+  GRADLE_CACHE_PUSH: true
+  GRADLE_CACHE_USERNAME: apikey
+  GRADLE_CACHE_PASSWORD: ${{ secrets.BUILDLESS_APIKEY }}
+  CACHE_ENDPOINT: https://gradle.less.build/cache/generic/
+  QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+jobs:
+  qodana:
+    name: "Scan"
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: "Qodana Scan"
+        continue-on-error: true
+        uses: JetBrains/qodana-action@v2023.1.0

@@ -1,0 +1,28 @@
+public final class com/benasher44/uuid/DeprecationsKt {
+	public static final fun getUuid (Ljava/util/UUID;)[B
+}
+
+public final class com/benasher44/uuid/NamebasedKt {
+	public static final fun uuid3Of (Ljava/util/UUID;Ljava/lang/String;)Ljava/util/UUID;
+	public static final fun uuid5Of (Ljava/util/UUID;Ljava/lang/String;)Ljava/util/UUID;
+}
+
+public abstract interface class com/benasher44/uuid/UuidHasher {
+	public abstract fun digest ()[B
+	public abstract fun getVersion ()I
+	public abstract fun update ([B)V
+}
+
+public final class com/benasher44/uuid/UuidKt {
+	public static final fun getBytes (Ljava/util/UUID;)[B
+	public static final fun getVariant (Ljava/util/UUID;)I
+	public static final fun getVersion (Ljava/util/UUID;)I
+	public static final fun uuid4 ()Ljava/util/UUID;
+	public static final fun uuidFrom (Ljava/lang/String;)Ljava/util/UUID;
+	public static final fun uuidOf ([B)Ljava/util/UUID;
+}
+
+public final class com/benasher44/uuid/UuidUtil {
+	public static final fun nameBasedUuidOf (Ljava/util/UUID;Ljava/lang/String;Lcom/benasher44/uuid/UuidHasher;)Ljava/util/UUID;
+}
+
