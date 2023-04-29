@@ -1,64 +1,71 @@
 group GROUP
 version VERSION
 
- dokka {
-   impliedPlatforms = ['Common'] // This will force platform tags for all non-common sources e.g. 'JVM'
-   kotlinTasks {
-     // dokka fails to retrieve sources from MPP-tasks so they must be set empty to avoid exception
-     // use sourceRoot instead (see below)
-     []
-   }
-   packageOptions {
-     prefix = GROUP
-   }
-   sourceRoot {
-     // assuming there is only a single source dir...
-     path = kotlin.sourceSets.commonMain.kotlin.srcDirs[0]
-     platforms = ['Common']
-   }
-   if (kotlin.sourceSets.getNames().contains('jvmMain')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.jvmMain.kotlin.srcDirs[0]
-       platforms = ['JVM']
-     }
-   }
-   if (kotlin.sourceSets.getNames().contains('jsMain')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.jsMain.kotlin.srcDirs[0]
-       platforms = ['js']
-     }
-   }
-   if (kotlin.sourceSets.getNames().contains('nativeMain')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.nativeMain.kotlin.srcDirs[0]
-       platforms = ['native']
-     }
-   }
-   if (kotlin.sourceSets.getNames().contains('nix32Main')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.nix32Main.kotlin.srcDirs[0]
-       platforms = ['native']
-     }
-   }
-   if (kotlin.sourceSets.getNames().contains('nix64Main')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.nix64Main.kotlin.srcDirs[0]
-       platforms = ['native']
-     }
-   }
-   if (kotlin.sourceSets.getNames().contains('mingwMain')) {
-     sourceRoot {
-       // assuming there is only a single source dir...
-       path = kotlin.sourceSets.mingwMain.kotlin.srcDirs[0]
-       platforms = ['native']
-     }
-   }
- }
+//dokka {
+//   impliedPlatforms = ['Common'] // This will force platform tags for all non-common sources e.g. 'JVM'
+//   kotlinTasks {
+//     // dokka fails to retrieve sources from MPP-tasks so they must be set empty to avoid exception
+//     // use sourceRoot instead (see below)
+//     []
+//   }
+//   packageOptions {
+//     prefix = GROUP
+//   }
+//   sourceRoot {
+//     // assuming there is only a single source dir...
+//     path = kotlin.sourceSets.commonMain.kotlin.srcDirs[0]
+//     platforms = ['Common']
+//   }
+//   if (kotlin.sourceSets.getNames().contains('jvmMain')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.jvmMain.kotlin.srcDirs[0]
+//       platforms = ['JVM']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('jsMain')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.jsMain.kotlin.srcDirs[0]
+//       platforms = ['js']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('wasmMain')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.wasmMain.kotlin.srcDirs[0]
+//       platforms = ['wasm']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('nativeMain')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.nativeMain.kotlin.srcDirs[0]
+//       platforms = ['native']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('nix32Main')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.nix32Main.kotlin.srcDirs[0]
+//       platforms = ['native']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('nix64Main')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.nix64Main.kotlin.srcDirs[0]
+//       platforms = ['native']
+//     }
+//   }
+//   if (kotlin.sourceSets.getNames().contains('mingwMain')) {
+//     sourceRoot {
+//       // assuming there is only a single source dir...
+//       path = kotlin.sourceSets.mingwMain.kotlin.srcDirs[0]
+//       platforms = ['native']
+//     }
+//   }
+// }
 
 def isReleaseBuild() {
   return VERSION.contains('SNAPSHOT') == false
@@ -71,7 +78,7 @@ def getReleaseRepositoryUrl() {
 
 def getSnapshotRepositoryUrl() {
   return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL :
-      'https://oss.sonatype.org/content/repositories/snapshots/'
+      'gcs://elide-snapshots/repository/v3'
 }
 
 def getRepositoryUsername() {
@@ -83,13 +90,13 @@ def getRepositoryPassword() {
 }
 
 // task javadocsJar(type: Jar, dependsOn: dokka) {
-  // archiveClassifier = 'javadoc'
-  // from dokka.outputDirectory
+//   archiveClassifier = 'javadoc'
+//   from dokka.outputDirectory
 // }
 
 publishing {
   publications.all {
-    artifact javadocsJar
+//    artifact javadocsJar
 
     pom.withXml {
       def root = asNode()
@@ -97,25 +104,25 @@ publishing {
       root.children().last() + {
         resolveStrategy = Closure.DELEGATE_FIRST
 
-        description POM_DESCRIPTION
-        name POM_NAME
-        url POM_URL
+        description properties["POM_DESCRIPTION"]
+        name properties["POM_NAME"]
+        url properties["POM_URL"]
         licenses {
           license {
-            name POM_LICENCE_NAME
-            url POM_LICENCE_URL
-            distribution POM_LICENCE_DIST
+            name properties["POM_LICENCE_NAME"]
+            url properties["POM_LICENCE_URL"]
+            distribution properties["POM_LICENCE_DIST"]
           }
         }
         scm {
-          url POM_SCM_URL
-          connection POM_SCM_CONNECTION
-          developerConnection POM_SCM_DEV_CONNECTION
+          url properties["POM_SCM_URL"]
+          connection properties["POM_SCM_CONNECTION"]
+          developerConnection properties["POM_SCM_DEV_CONNECTION"]
         }
         developers {
           developer {
-            id POM_DEVELOPER_ID
-            name POM_DEVELOPER_NAME
+            id properties["POM_DEVELOPER_ID"]
+            name properties["POM_DEVELOPER_NAME"]
           }
         }
       }
@@ -125,10 +132,12 @@ publishing {
   repositories {
     maven {
       url isReleaseBuild() ? getReleaseRepositoryUrl() : getSnapshotRepositoryUrl()
-      credentials {
-        username getRepositoryUsername()
-        password getRepositoryPassword()
-      }
+//      if (getRepositoryUsername() != null) {
+//        credentials {
+//          username getRepositoryUsername()
+//          password getRepositoryPassword()
+//        }
+//      }
     }
   }
 }
@@ -163,6 +172,7 @@ tasks.register('publishMac') {
     dependsOn 'publishMacosX64PublicationToMavenRepository'
     dependsOn 'publishJvmPublicationToMavenRepository'
     dependsOn 'publishJsPublicationToMavenRepository'
+    dependsOn 'publishWasmPublicationToMavenRepository'
     dependsOn 'publishKotlinMultiplatformPublicationToMavenRepository'
 }
 

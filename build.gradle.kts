@@ -3,7 +3,11 @@
     "DSL_SCOPE_VIOLATION",
     "UNUSED_VARIABLE",
 )
+@file:OptIn(
+    org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class
+)
 
+import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
@@ -15,6 +19,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 plugins {
+    alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.doctor)
     alias(libs.plugins.dokka)
@@ -61,6 +66,17 @@ repositories {
     maven("https://maven.pkg.st/")
 }
 
+testlogger {
+    theme = MOCHA_PARALLEL
+    showExceptions = System.getenv("TEST_EXCEPTIONS") == "true"
+    showFailed = true
+    showPassed = true
+    showSkipped = true
+    showFailedStandardStreams = true
+    showFullStackTraces = true
+    slowThreshold = 30000L
+}
+
 kotlin {
     explicitApi()
 
@@ -76,9 +92,15 @@ kotlin {
             browser()
             nodejs()
         }
+
+        wasm {
+            browser()
+        }
+
         jvm {
             jvmToolchain(jvmTargetMinimum.toIntOrNull() ?: defaultJavaToolchain)
         }
+
         if (HostManager.hostIsMac) {
             macosX64()
             macosArm64()
@@ -106,18 +128,39 @@ kotlin {
 
     sourceSets {
         val commonMain by getting
-        val commonTest by getting {
+        val commonTest by getting
+        val universalMain by creating { dependsOn(commonMain) }
+        val universalTest by creating { dependsOn(commonTest) }
+        val nonWasmMain by creating { dependsOn(universalMain) }
+        val nonWasmTest by creating {
+            dependsOn(universalTest)
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val nonJvmMain by creating { dependsOn(commonMain) }
-        val nonJvmTest by creating { dependsOn(commonTest) }
+        val nonJvmMain by creating {
+            dependsOn(nonWasmMain)
+        }
+        val nonJvmTest by creating {
+            dependsOn(nonWasmTest)
+        }
+        val jvmMain by getting { dependsOn(nonWasmMain) }
+        val jvmTest by getting { dependsOn(nonWasmTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
-        val nativeMain by creating { dependsOn(nonJvmMain) }
-        val nativeTest by creating { dependsOn(nonJvmTest) }
+        val nativeMain by creating {
+            dependsOn(nonJvmMain)
+            dependsOn(nonWasmMain)
+        }
+        val nativeTest by creating {
+            dependsOn(nonJvmTest)
+            dependsOn(nonWasmTest)
+        }
+        val wasmMain by getting {
+            dependsOn(universalMain)
+        }
+        val wasmTest by getting { dependsOn(universalTest) }
         val nix64Main by creating { dependsOn(nativeMain) }
         val nix64Test by creating { dependsOn(nativeTest) }
         val nix32Main by creating { dependsOn(nativeMain) }
@@ -248,7 +291,7 @@ checkTask.configure {
     dependsOn(ktlint)
 }
 
-// apply(from = "publish.gradle")
+apply(from = "publish.gradle")
 
 // Generate PROJECT_DIR_ROOT for referencing local mocks in tests
 
@@ -260,11 +303,8 @@ val generateProjDirValTask: TaskProvider<Task> = tasks.register("generateProject
     projDirFile.writeText("")
     projDirFile.appendText(
         """
-            |package com.benasher44.uuid
+            |package dev.elide.uuid
             |
-            |import kotlin.native.concurrent.SharedImmutable
-            |
-            |@SharedImmutable
             |internal const val PROJECT_DIR_ROOT = ""${'"'}${projectDirPath}""${'"'}
             |
         """.trimMargin()
@@ -395,6 +435,15 @@ tasks.create("preMerge") {
 }
 
 afterEvaluate {
+    listOf(
+        "wasmTest",
+        "compileTestDevelopmentExecutableKotlinWasm",
+    ).forEach {
+        tasks.named(it).configure {
+            enabled = false
+        }
+    }
+
     cacheDisabledTasks.forEach {
         try {
             tasks.named(it).configure {
