@@ -46,16 +46,6 @@ on:
         required: false
         type: string
         default: ""
-      gvm:
-        description: "GraalVM version"
-        required: false
-        type: string
-        default: ${{ vars.GVM_VERSION }}
-      java:
-        description: "JVM target"
-        required: false
-        type: string
-        default: ${{ vars.JVM_VERSION }}
       gcs:
         description: "Is this a GCS publish?"
         required: false
@@ -102,14 +92,6 @@ on:
         required: false
         type: string
         default: ""
-      gvm:
-        required: false
-        type: string
-        default: ${{ vars.GVM_VERSION }}
-      java:
-        required: false
-        type: string
-        default: ${{ vars.JVM_VERSION }}
       gcs:
         required: false
         type: boolean
@@ -138,22 +120,22 @@ jobs:
             flags: "--no-configuration-cache"
             os: "macos"
             label: "Darwin"
-            gvm: ${{ inputs.gvm }}
-            java: ${{ inputs.java }}
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
             target: publishMac
           - runner: windows-latest-8-cores
             flags: "--no-configuration-cache"
             os: "windows"
             label: "Windows"
-            gvm: ${{ inputs.gvm }}
-            java: ${{ inputs.java }}
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
             target: publishWindows
           - runner: ubuntu-latest-4-cores
             flags: "--no-configuration-cache"
             os: "linux"
             label: "Linux"
-            gvm: ${{ inputs.gvm }}
-            java: ${{ inputs.java }}
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
             target: publishLinux
 
     steps:
