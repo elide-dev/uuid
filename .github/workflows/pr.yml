@@ -118,3 +118,48 @@ jobs:
           REPOSITORY_NAME: ${{ github.repository }}
           AZURE_OPENAI_API: ${{ secrets.AZURE_OPENAI_API }}
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+
+  publish-sandbox:
+    permissions: write-all
+    name: "Publish: Sandbox"
+    needs: ["build", "review"]
+    if: contains(github.event.pull_request.labels.*.name, 'ci:publish-snapshot')
+    uses: ./.github/workflows/step.publish.yml
+    secrets:
+      inherit: true
+      GOOGLE_CREDENTIALS: ${{ secrets.BUILDBOT_SERVICE_ACCOUNT }}
+      SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+    with:
+      version: "1.0-SNAPSHOT"
+      repository: "gcs://elide-snapshots/repository/v3"
+      logLevel: "info"
+      snapshot: true
+      release: false
+      signing: true
+      gcs: true
+      environment: sandbox
+      label: "Elide Sandbox"
+      gvm: ${{ vars.GVM_VERSION }}
+      java: ${{ vars.JVM_VERSION }}
+
+  publish-live:
+    permissions: write-all
+    name: "Publish: Live"
+    if: contains(github.event.pull_request.labels.*.name, 'ci:publish') && (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+    needs: ["build", "review", "publish-sandbox"]
+    uses: ./.github/workflows/step.publish.yml
+    secrets:
+      inherit: true
+      PUBLISH_USER: ${{ secrets.PUBLISH_USER_CENTRAL }}
+      PUBLISH_PASSWORD: ${{ secrets.PUBLISH_TOKEN_CENTRAL }}
+    with:
+      repository: "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      logLevel: "info"
+      snapshot: false
+      release: true
+      signing: true
+      gcs: false
+      environment: central
+      label: "Maven Central"
+      gvm: ${{ vars.GVM_VERSION }}
+      java: ${{ vars.JVM_VERSION }}

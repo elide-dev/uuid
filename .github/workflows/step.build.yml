@@ -19,11 +19,11 @@ on:
       gvm:
         required: false
         type: string
-        default: "22.3.1"
+        default: ${{ vars.GVM_VERSION }}
       java:
         required: false
         type: string
-        default: "19"
+        default: ${{ vars.JVM_VERSION }}
       coverage:
         required: false
         type: boolean
@@ -80,8 +80,8 @@ jobs:
       - name: "Setup: GraalVM"
         uses: graalvm/setup-graalvm@v1
         with:
-          version: 22.3.1
-          java-version: '19'
+          version: ${{ inputs.gvm }}
+          java-version: ${{ inputs.java }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: "Build and Test"
         uses: gradle/gradle-build-action@v2

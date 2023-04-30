@@ -512,10 +512,16 @@ publishing {
 
     repositories {
         maven {
-            url = URI.create(if (isReleaseBuild) {
-                "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            } else {
-                "gcs://elide-snapshots/repository/v3"
+            url = URI.create(when {
+                // if we are given an explicit repository, use it
+                !(properties["REPOSITORY"] as? String).isNullOrBlank() -> (properties["REPOSITORY"] as String)
+
+                // otherwise, default to releases for a release build, or fall back to the elide snapshots repo
+                else -> if (isReleaseBuild) {
+                    "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                } else {
+                    "gcs://elide-snapshots/repository/v3"
+                }
             })
             if (!mavenUsername.isNullOrBlank() && !mavenPassword.isNullOrBlank()) {
                 credentials {
