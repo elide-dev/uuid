@@ -126,7 +126,6 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'ci:publish-snapshot')
     uses: ./.github/workflows/step.publish.yml
     secrets:
-      inherit: true
       GOOGLE_CREDENTIALS: ${{ secrets.BUILDBOT_SERVICE_ACCOUNT }}
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
     with:
@@ -139,8 +138,6 @@ jobs:
       gcs: true
       environment: sandbox
       label: "Elide Sandbox"
-      gvm: ${{ vars.GVM_VERSION }}
-      java: ${{ vars.JVM_VERSION }}
 
   publish-live:
     permissions: write-all
@@ -149,7 +146,6 @@ jobs:
     needs: ["build", "review", "publish-sandbox"]
     uses: ./.github/workflows/step.publish.yml
     secrets:
-      inherit: true
       PUBLISH_USER: ${{ secrets.PUBLISH_USER_CENTRAL }}
       PUBLISH_PASSWORD: ${{ secrets.PUBLISH_TOKEN_CENTRAL }}
     with:
@@ -161,5 +157,3 @@ jobs:
       gcs: false
       environment: central
       label: "Maven Central"
-      gvm: ${{ vars.GVM_VERSION }}
-      java: ${{ vars.JVM_VERSION }}

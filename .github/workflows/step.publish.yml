@@ -60,10 +60,7 @@ on:
       logLevel:
         required: false
         default: 'info'
-        type: choice
-        options:
-          - info
-          - debug
+        type: string
       version:
         required: false
         type: string
@@ -96,6 +93,9 @@ on:
         required: false
         type: boolean
         default: false
+      environment:
+        type: string
+        required: true
     secrets:
       PUBLISH_USER:
         required: false
@@ -109,7 +109,8 @@ on:
 jobs:
   publish:
     name: Publish
-    needs: ["prepare"]
+    environment: ${{ inputs.environment }}
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
