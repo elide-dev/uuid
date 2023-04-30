@@ -1,7 +1,7 @@
-name: PR
+name: Push
 
 on:
-  pull_request:
+  push:
     branches:
       - master
       - beta
@@ -27,7 +27,6 @@ jobs:
       contents: "read"
       id-token: "write"
       checks: "write"
-      pull-requests: "write"
 
     strategy:
       fail-fast: false
@@ -93,37 +92,10 @@ jobs:
       contents: read
       security-events: write
 
-  review:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    name: "Analysis: Auto-Review"
-    needs: ["build"]
-    continue-on-error: true
-    steps:
-      - name: "Setup: Checkout"
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 2
-      - name: "Auto PR Review"
-        uses: microsoft/gpt-review@0.1.2
-        continue-on-error: true
-        with:
-          GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ORG_KEY: ${{ secrets.OPENAI_ORG_ID }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          REPOSITORY_NAME: ${{ github.repository }}
-          AZURE_OPENAI_API: ${{ secrets.AZURE_OPENAI_API }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-
   publish-sandbox:
     permissions: write-all
     name: "Publish: Sandbox"
     needs: ["build", "codeql", "qodana"]
-    if: contains(github.event.pull_request.labels.*.name, 'ci:publish-snapshot')
     uses: ./.github/workflows/step.publish.yml
     secrets:
       GOOGLE_CREDENTIALS: ${{ secrets.BUILDBOT_SERVICE_ACCOUNT }}
@@ -138,22 +110,3 @@ jobs:
       gcs: true
       environment: sandbox
       label: "Elide Sandbox"
-
-  publish-live:
-    permissions: write-all
-    name: "Publish: Live"
-    if: contains(github.event.pull_request.labels.*.name, 'ci:publish') && (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
-    needs: ["build", "codeql", "qodana", "publish-sandbox"]
-    uses: ./.github/workflows/step.publish.yml
-    secrets:
-      PUBLISH_USER: ${{ secrets.PUBLISH_USER_CENTRAL }}
-      PUBLISH_PASSWORD: ${{ secrets.PUBLISH_TOKEN_CENTRAL }}
-    with:
-      repository: "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      logLevel: "info"
-      snapshot: false
-      release: true
-      signing: true
-      gcs: false
-      environment: central
-      label: "Maven Central"
