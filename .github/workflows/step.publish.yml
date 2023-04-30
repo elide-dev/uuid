@@ -12,7 +12,7 @@ on:
         description: "Target repository"
         required: false
         type: string
-        default: "gcs://elide-snapshots/repository/v3"
+        default: gcs://elide-snapshots/repository/v3
       logLevel:
         description: "Logging level"
         required: true
@@ -68,7 +68,7 @@ on:
       repository:
         required: false
         type: string
-        default: "gcs://elide-snapshots/repository/v3"
+        default: gcs://elide-snapshots/repository/v3
       snapshot:
         required: false
         type: boolean
@@ -109,7 +109,6 @@ on:
 jobs:
   publish:
     name: Publish
-    environment: ${{ inputs.environment }}
     runs-on: ${{ matrix.runner }}
 
     strategy:

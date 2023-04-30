@@ -2,9 +2,8 @@ name: PR
 
 on:
   pull_request:
-    branches:
-      - master
-      - beta
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches: [master, main, beta]
 
 env:
   CI: "true"
@@ -130,7 +129,7 @@ jobs:
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
     with:
       version: "1.0-SNAPSHOT"
-      repository: "gcs://elide-snapshots/repository/v3"
+      repository: gcs://elide-snapshots/repository/v3
       logLevel: "info"
       snapshot: true
       release: false

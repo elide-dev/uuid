@@ -2,9 +2,7 @@ name: Push
 
 on:
   push:
-    branches:
-      - master
-      - beta
+    branches: [master, main, beta]
 
 env:
   CI: "true"

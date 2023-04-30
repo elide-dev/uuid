@@ -522,7 +522,7 @@ publishing {
                 } else {
                     "gcs://elide-snapshots/repository/v3"
                 }
-            })
+            }.replace("\"", ""))
             if (!mavenUsername.isNullOrBlank() && !mavenPassword.isNullOrBlank()) {
                 credentials {
                     username = mavenUsername
