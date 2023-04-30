@@ -128,15 +128,15 @@ jobs:
       GOOGLE_CREDENTIALS: ${{ secrets.BUILDBOT_SERVICE_ACCOUNT }}
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
     with:
-      version: "1.0-SNAPSHOT"
+      version: 1.0-SNAPSHOT
       repository: gcs://elide-snapshots/repository/v3
-      logLevel: "info"
+      logLevel: info
       snapshot: true
       release: false
       signing: true
       gcs: true
       environment: sandbox
-      label: "Elide Sandbox"
+      label: Elide Sandbox
 
   publish-live:
     permissions: write-all

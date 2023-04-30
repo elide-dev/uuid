@@ -458,13 +458,13 @@ tasks.register("relock") {
     )
 }
 
-val dokkaHtml by tasks.getting(DokkaTask::class)
+//val dokkaHtml by tasks.getting(DokkaTask::class)
 
-val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokkaHtml)
-    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
-}
+//val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+//    dependsOn(tasks.dokkaHtml)
+//    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+//    archiveClassifier.set("javadoc")
+//}
 
 val mavenUsername: String? = properties["mavenUsername"] as? String
 val mavenPassword: String? = properties["mavenPassword"] as? String
@@ -483,7 +483,7 @@ tasks.withType(Sign::class) {
 
 publishing {
     publications.withType<MavenPublication> {
-        artifact(javadocJar)
+//        artifact(javadocJar)
         artifactId = artifactId.replace("uuid", "elide-uuid")
 
         pom {

@@ -7,7 +7,7 @@ on:
         description: "Version to publish"
         required: false
         type: string
-        default: "1.0-SNAPSHOT"
+        default: 1.0-SNAPSHOT
       repository:
         description: "Target repository"
         required: false
@@ -16,7 +16,7 @@ on:
       logLevel:
         description: "Logging level"
         required: true
-        default: "info"
+        default: info
         type: choice
         options:
           - info
@@ -59,12 +59,12 @@ on:
     inputs:
       logLevel:
         required: false
-        default: 'info'
+        default: info
         type: string
       version:
         required: false
         type: string
-        default: "1.0-SNAPSHOT"
+        default: 1.0-SNAPSHOT
       repository:
         required: false
         type: string
