@@ -476,9 +476,7 @@ signing {
 }
 
 tasks.withType(Sign::class) {
-    onlyIf {
-        isReleaseBuild
-    }
+    enabled = isReleaseBuild
 }
 
 publishing {
