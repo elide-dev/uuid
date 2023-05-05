@@ -1,4 +1,5 @@
-package com.benasher44.uuid
+@file:JvmName("UuidJvm")
+package dev.elide.uuid
 
 import java.nio.ByteBuffer
 import java.util.UUID

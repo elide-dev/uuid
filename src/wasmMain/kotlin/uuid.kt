@@ -1,6 +1,21 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "DuplicatedCode")
 
 package dev.elide.uuid
+
+// Ranges of non-hyphen characters in a UUID string
+internal val UUID_CHAR_RANGES: Array<IntRange> = arrayOf(
+    IntRange(0, 8),
+    IntRange(9, 13),
+    IntRange(14, 18),
+    IntRange(19, 23),
+    IntRange(24, 36),
+)
+
+// Indices of the hyphen characters in a UUID string
+internal val UUID_HYPHEN_INDICES = arrayOf(8, 13, 18, 23)
+
+// UUID chars arranged from smallest to largest, so they can be indexed by their byte representations
+internal val UUID_CHARS = arrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
 /**
  * A RFC4122 UUID
@@ -20,13 +35,6 @@ public actual class Uuid @Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidO
     public actual val leastSignificantBits: Long
         get() = uuidBytes.bits(8, 16)
 
-    init {
-        require(uuidBytes.count() == UUID_BYTES) {
-            "Invalid UUID bytes. Expected $UUID_BYTES bytes; found ${uuidBytes.count()}"
-        }
-        this.freeze()
-    }
-
     private companion object {
         private fun ByteArray.bits(start: Int, end: Int): Long {
             var b = 0L
@@ -37,33 +45,33 @@ public actual class Uuid @Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidO
             return b
         }
 
-        /** Creates the [ByteArray] from most and least significant bits */
-        private fun fromBits(msb: Long, lsb: Long) = ByteArray(UUID_BYTES).also { bytes ->
-            (7 downTo 0).fold(msb) { x, i ->
-                bytes[i] = (x and 0xff).toByte()
-                x shr 8
-            }
-            (15 downTo 8).fold(lsb) { x, i ->
-                bytes[i] = (x and 0xff).toByte()
-                x shr 8
-            }
+        private inline fun <T, R> Array<out T>.fold(initial: R, operation: (acc: R, T) -> R): R {
+            var accumulator = initial
+            for (element in this) accumulator = operation(accumulator, element)
+            return accumulator
         }
 
-        /** @returns the Int representation of a given UUID character */
-        private fun halfByteFromChar(char: Char) = when (char) {
-            in '0'..'9' -> char.code - 48
-            in 'a'..'f' -> char.code - 87
-            in 'A'..'F' -> char.code - 55
-            else -> null
+        /** Creates the [ByteArray] from most and least significant bits */
+        private fun fromBits(msb: Long, lsb: Long): ByteArray {
+            val bytes = ByteArray(UUID_BYTES)
+            arrayOf(7, 6, 5, 4, 3, 2, 1, 0).fold(msb) { x, i ->
+                bytes[i] = (x and 0xff).toByte()
+                x shr 8
+            }
+            arrayOf(15, 14, 13, 12, 11, 10, 9, 8).fold(lsb) { x, i ->
+                bytes[i] = (x and 0xff).toByte()
+                x shr 8
+            }
+            return bytes
         }
 
         /** The ranges of sections of UUID bytes, to be separated by hyphens */
-        private val uuidByteRanges: List<IntRange> = listOf(
-            0 until 4,
-            4 until 6,
-            6 until 8,
-            8 until 10,
-            10 until 16
+        private val uuidByteRanges: Array<IntRange> = arrayOf(
+            IntRange(0, 4),
+            IntRange(4, 6),
+            IntRange(6, 8),
+            IntRange(8, 10),
+            IntRange(10, 16),
         )
     }
 
@@ -86,26 +94,35 @@ public actual class Uuid @Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidO
                 characters[charIndex++] = '-'
             }
         }
-        return characters.concatToString()
+        val str = ""
+        for (character in characters) {
+            str.plus(character)
+        }
+        return str
     }
 
     /**
      * @return true if other is a UUID and its uuid bytes are equal to this one
      */
-    override fun equals(other: Any?): Boolean =
-        other is Uuid && uuidBytes.contentEquals(other.uuidBytes)
+    override fun equals(other: Any?): Boolean {
+        if (other !is Uuid) return false
+        for (i in arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)) {
+            if (uuidBytes[i] != other.uuidBytes[i]) return false
+        }
+        return true
+    }
 
     /**
      * @return The hashCode of the uuid bytes
      */
     override fun hashCode(): Int =
-        uuidBytes.contentHashCode()
+        uuidBytes.hashCode() // should be content hash code
 
     /**
      * @return The result of comparing [uuidBytes] between this and [other]
      */
     override fun compareTo(other: Uuid): Int {
-        for (i in (0 until UUID_BYTES)) {
+        for (i in arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)) {
             val compareResult = uuidBytes[i].compareTo(other.uuidBytes[i])
             if (compareResult != 0) return compareResult
         }
@@ -130,30 +147,25 @@ public actual val Uuid.version: Int
  * @return Itself after setting the [Uuid.variant] and [Uuid.version].
  */
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun ByteArray.setVersion(version: Int) = apply {
+internal inline fun ByteArray.setVersion(version: Int): ByteArray {
     this[6] = ((this[6].toInt() and 0x0F) or (version shl 4)).toByte()
     this[8] = ((this[8].toInt() and 0x3F) or 0x80).toByte()
+    return this
 }
 
 @Suppress("DEPRECATION")
 public actual fun uuidOf(bytes: ByteArray): Uuid = Uuid(bytes)
 
 /** Returns the Int representation of a given UUID character */
+@Suppress("DEPRECATION")
 private fun halfByteFromChar(char: Char) = when (char) {
-    in '0'..'9' -> char.code - 48
-    in 'a'..'f' -> char.code - 87
-    in 'A'..'F' -> char.code - 55
+    in '0'..'9' -> char.toInt() - 48
+    in 'a'..'f' -> char.toInt() - 87
+    in 'A'..'F' -> char.toInt() - 55
     else -> null
 }
 
 public actual fun uuidFrom(string: String): Uuid {
-    require(string.length == UUID_STRING_LENGTH) {
-        "Uuid string has invalid length: $string"
-    }
-    require(UUID_HYPHEN_INDICES.all { string[it] == '-' }) {
-        "Uuid string has invalid format: $string"
-    }
-
     val bytes = ByteArray(UUID_BYTES)
     var byte = 0
     for (range in UUID_CHAR_RANGES) {
@@ -162,12 +174,9 @@ public actual fun uuidFrom(string: String): Uuid {
             // Collect each pair of UUID chars and their int representations
             val left = halfByteFromChar(string[i++])
             val right = halfByteFromChar(string[i++])
-            require(left != null && right != null) {
-                "Uuid string has invalid characters: $string"
-            }
 
             // smash them together into a single byte
-            bytes[byte++] = (left.shl(4) or right).toByte()
+            bytes[byte++] = (left!!.shl(4) or right!!).toByte()
         }
     }
     @Suppress("DEPRECATION")
@@ -177,3 +186,5 @@ public actual fun uuidFrom(string: String): Uuid {
 @Suppress("DEPRECATION")
 public actual fun uuid4(): Uuid =
     Uuid(getRandomUuidBytes().setVersion(4))
+
+public external fun getRandomUuidBytes(): ByteArray

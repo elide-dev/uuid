@@ -1,4 +1,4 @@
-package com.benasher44.uuid
+package dev.elide.uuid
 
 @Deprecated("Use `Uuid` instead.", ReplaceWith("Uuid"))
 public typealias UUID = Uuid

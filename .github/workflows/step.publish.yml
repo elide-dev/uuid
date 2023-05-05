@@ -1,0 +1,203 @@
+name: "CodeQL"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish"
+        required: false
+        type: string
+        default: 1.0-SNAPSHOT
+      repository:
+        description: "Target repository"
+        required: false
+        type: string
+        default: gcs://elide-snapshots/repository/v3
+      logLevel:
+        description: "Logging level"
+        required: true
+        default: info
+        type: choice
+        options:
+          - info
+          - debug
+      snapshot:
+        description: "Is this a snapshot?"
+        required: false
+        type: boolean
+        default: true
+      release:
+        description: "Is this a release?"
+        required: false
+        type: boolean
+        default: false
+      signing:
+        description: "Enable signing"
+        required: false
+        type: boolean
+        default: false
+      label:
+        description: "Label"
+        required: false
+        type: string
+        default: "Sandbox"
+      flags:
+        description: "Extra flags"
+        required: false
+        type: string
+        default: ""
+      gcs:
+        description: "Is this a GCS publish?"
+        required: false
+        type: boolean
+        default: false
+      environment:
+        description: "Environment target"
+        type: environment
+        required: true
+  workflow_call:
+    inputs:
+      logLevel:
+        required: false
+        default: info
+        type: string
+      version:
+        required: false
+        type: string
+        default: 1.0-SNAPSHOT
+      repository:
+        required: false
+        type: string
+        default: gcs://elide-snapshots/repository/v3
+      snapshot:
+        required: false
+        type: boolean
+        default: true
+      release:
+        required: false
+        type: boolean
+        default: false
+      signing:
+        required: false
+        type: boolean
+        default: false
+      label:
+        required: false
+        type: string
+        default: "Sandbox"
+      flags:
+        required: false
+        type: string
+        default: ""
+      gcs:
+        required: false
+        type: boolean
+        default: false
+      environment:
+        type: string
+        required: true
+    secrets:
+      PUBLISH_USER:
+        required: false
+      PUBLISH_PASSWORD:
+        required: false
+      GOOGLE_CREDENTIALS:
+        required: false
+      SIGNING_KEY:
+        required: false
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macOS-latest, windows-latest-8-cores, ubuntu-latest-4-cores]
+        include:
+          - runner: macOS-latest
+            flags: "--no-configuration-cache"
+            os: "macos"
+            label: "Darwin"
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+            target: publishMac
+          - runner: windows-latest-8-cores
+            flags: "--no-configuration-cache"
+            os: "windows"
+            label: "Windows"
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+            target: publishWindows
+          - runner: ubuntu-latest-4-cores
+            flags: "--no-configuration-cache"
+            os: "linux"
+            label: "Linux"
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+            target: publishLinux
+
+    steps:
+      - name: "Setup: Checkout"
+        uses: actions/checkout@v3
+      - name: "Setup: Cache"
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+          path: |
+            ~/.sonar/cache
+            ~/.konan
+            ~/.gradle/caches
+      - id: 'auth'
+        name: "Setup: GCS"
+        if: ${{ inputs.gcs == true }}
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      - name: 'Set up Cloud SDK'
+        if: ${{ inputs.gcs == true }}
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '${{ vars.GCLOUD_VERSION }}'
+      - name: "Setup: GraalVM"
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: ${{ matrix.gvm }}
+          java-version: ${{ matrix.java }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Publish (${{ matrix.label }})"
+        uses: gradle/gradle-build-action@v2
+        id: publish
+        with:
+          cache-read-only: true
+          gradle-version: wrapper
+          gradle-home-cache-cleanup: true
+          gradle-home-cache-includes: |
+            caches
+            notifications
+            jdks
+          gradle-home-cache-excludes: |
+            caches/build-cache-1
+            caches/keyrings
+          arguments: |
+            ${{ matrix.target }}
+            --scan
+            --no-daemon
+            --warning-mode=none
+            --dependency-verification=lenient
+            -Pci=true
+            -PVERSION="${{ inputs.version }}"
+            -PREPOSITORY="${{ inputs.repository }}"
+            --${{ inputs.logLevel }}
+            ${{ inputs.flags }}
+            ${{ matrix.flags }}
+      - name: "Artifacts: Libraries"
+        uses: actions/upload-artifact@v3
+        if: failure() || success()
+        with:
+          name: reports
+          path: |
+            build/libs/
