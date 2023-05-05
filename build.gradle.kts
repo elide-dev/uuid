@@ -29,6 +29,7 @@ plugins {
     alias(libs.plugins.sonar)
     alias(libs.plugins.kover)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.nexus)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.benchmark)
     alias(libs.plugins.kotlinx.apiValidator)
@@ -507,26 +508,13 @@ publishing {
             }
         }
     }
+}
 
+nexusPublishing {
     repositories {
-        maven {
-            url = URI.create(when {
-                // if we are given an explicit repository, use it
-                !(properties["REPOSITORY"] as? String).isNullOrBlank() -> (properties["REPOSITORY"] as String)
-
-                // otherwise, default to releases for a release build, or fall back to the elide snapshots repo
-                else -> if (isReleaseBuild) {
-                    "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                } else {
-                    "gcs://elide-snapshots/repository/v3"
-                }
-            }.replace("\"", ""))
-            if (!mavenUsername.isNullOrBlank() && !mavenPassword.isNullOrBlank()) {
-                credentials {
-                    username = mavenUsername
-                    password = mavenPassword
-                }
-            }
+        sonatype {  //only for users registered in Sonatype after 24 Feb 2021
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
 }
