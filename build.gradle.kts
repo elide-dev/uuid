@@ -516,7 +516,7 @@ val mavenUsername: String? = properties["mavenUsername"] as? String
 val mavenPassword: String? = properties["mavenPassword"] as? String
 
 tasks.withType(Sign::class) {
-    enabled = isReleaseBuild
+    onlyIf { isReleaseBuild && (System.getenv("SIGNING_KEYID") != null) }
 }
 
 publishing {
@@ -567,6 +567,16 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
+}
+
+signing {
+    isRequired = isReleaseBuild
+    useGpgCmd()
+    sign(publishing.publications)
+}
+
+tasks.withType(AbstractPublishToMaven::class.java) {
+    dependsOn(tasks.withType(Sign::class))
 }
 
 val reports: TaskProvider<Task> = tasks.register("reports") {
