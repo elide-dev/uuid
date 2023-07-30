@@ -64,7 +64,7 @@ val nodeVersion: String by properties
 val sonarScan: String by properties
 val GROUP: String by properties
 val VERSION: String by properties
-val enableSbom = false
+val enableSbom = true
 val enableCyclonedx = false
 
 group = GROUP
@@ -480,7 +480,7 @@ tasks.register("relock") {
 spdxSbom {
     targets {
         create("release") {
-            configurations.set(listOf("jvmCompileClasspath"))
+            configurations.set(listOf("jvmRuntimeClasspath"))
 
             scm {
                 uri.set("https://github.com/elide-dev/uuid")
@@ -494,6 +494,19 @@ spdxSbom {
             }
         }
     }
+}
+
+tasks.cyclonedxBom {
+    setIncludeConfigs(listOf("jvmRuntimeClasspath"))
+    setProjectType("library")
+    setDestination(project.file("build/reports"))
+    setOutputFormat("all")
+    setIncludeBomSerialNumber(true)
+    setComponentVersion("2.0.0")
+}
+
+tasks.build {
+    finalizedBy(tasks.spdxSbom)
 }
 
 val mavenUsername: String? = properties["mavenUsername"] as? String
