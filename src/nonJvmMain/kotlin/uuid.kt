@@ -64,14 +64,6 @@ constructor(internal val uuidBytes: ByteArray) : Comparable<Uuid> {
             }
         }
 
-        /** @returns the Int representation of a given UUID character */
-        private fun halfByteFromChar(char: Char) = when (char) {
-            in '0'..'9' -> char.code - 48
-            in 'a'..'f' -> char.code - 87
-            in 'A'..'F' -> char.code - 55
-            else -> null
-        }
-
         /** The ranges of sections of UUID bytes, to be separated by hyphens */
         private val uuidByteRanges: List<IntRange> = listOf(
             0 until 4,

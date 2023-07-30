@@ -589,6 +589,8 @@ tasks.withType(AbstractPublishToMaven::class.java) {
 }
 
 val reports: TaskProvider<Task> by tasks.registering {
+    group = "reports"
+
     dependsOn(
         tasks.koverXmlReport,
         tasks.dependencyReport,
@@ -596,7 +598,7 @@ val reports: TaskProvider<Task> by tasks.registering {
     )
 }
 
-val check: TaskProvider<Task> by tasks.registering {
+tasks.check {
     dependsOn(
         ktlint,
         tasks.apiCheck,
@@ -605,9 +607,13 @@ val check: TaskProvider<Task> by tasks.registering {
 }
 
 val preMerge: TaskProvider<Task> by tasks.registering {
+    group = "test"
+    description = "Run all tests and checks"
+
     listOfNotNull(
         tasks.build,
         tasks.check,
+        tasks.koverXmlReport,
         if (enableSbom) tasks.spdxSbom else null,
         if (enableCyclonedx) tasks.cyclonedxBom else null,
         reports,
