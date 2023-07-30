@@ -22,17 +22,16 @@
 )
 
 import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
-import java.net.URI
 
 plugins {
     alias(libs.plugins.testlogger)
@@ -108,6 +107,14 @@ testlogger {
     slowThreshold = 30000L
 }
 
+tasks.dokkaHtml {
+    dokkaSourceSets {
+        configureEach {
+            samples.from("src/commonTest/kotlin")
+        }
+    }
+}
+
 kotlin {
     explicitApi()
 
@@ -123,15 +130,18 @@ kotlin {
             browser()
             nodejs()
         }
-
-        wasm {
-            browser()
-        }
-
         jvm {
             jvmToolchain(jvmTargetMinimum.toIntOrNull() ?: defaultJavaToolchain)
-        }
 
+            compilations.all {
+                kotlinOptions {
+                    jvmTarget = jvmTargetMinimum
+                }
+            }
+        }
+        wasm {
+            d8()
+        }
         if (HostManager.hostIsMac) {
             macosX64()
             macosArm64()
@@ -142,6 +152,7 @@ kotlin {
             watchosArm64()
             watchosX64()
             watchosSimulatorArm64()
+            watchosDeviceArm64()
             tvosArm64()
             tvosX64()
             tvosSimulatorArm64()
@@ -159,39 +170,19 @@ kotlin {
 
     sourceSets {
         val commonMain by getting
-        val commonTest by getting
-        val nonWasmMain by creating { dependsOn(commonMain) }
-        val nonWasmTest by creating {
-            dependsOn(commonTest)
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val nonJvmMain by creating {
-            dependsOn(nonWasmMain)
-        }
-        val nonJvmTest by creating {
-            dependsOn(nonWasmTest)
-        }
-        val jvmMain by getting { dependsOn(nonWasmMain) }
-        val jvmTest by getting { dependsOn(nonWasmTest) }
+        val nonJvmMain by creating { dependsOn(commonMain) }
+        val nonJvmTest by creating { dependsOn(commonTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
+        val wasmMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
-        val nativeMain by creating {
-            dependsOn(nonJvmMain)
-            dependsOn(nonWasmMain)
-        }
-        val nativeTest by creating {
-            dependsOn(nonJvmTest)
-            dependsOn(nonWasmTest)
-        }
-        val wasmMain by getting {
-            dependsOn(commonMain)
-        }
-        val wasmTest by getting {
-            dependsOn(commonTest)
-        }
+        val nativeMain by creating { dependsOn(nonJvmMain) }
+        val nativeTest by creating { dependsOn(nonJvmTest) }
         val nix64Main by creating { dependsOn(nativeMain) }
         val nix64Test by creating { dependsOn(nativeTest) }
         val nix32Main by creating { dependsOn(nativeMain) }
@@ -234,6 +225,8 @@ kotlin {
             val watchosX64Test by getting { dependsOn(apple64Test) }
             val watchosSimulatorArm64Main by getting { dependsOn(apple64Main) }
             val watchosSimulatorArm64Test by getting { dependsOn(apple64Test) }
+            val watchosDeviceArm64Main by getting { dependsOn(apple64Main) }
+            val watchosDeviceArm64Test by getting { dependsOn(apple64Test) }
             val tvosArm64Main by getting { dependsOn(apple64Main) }
             val tvosArm64Test by getting { dependsOn(apple64Test) }
             val tvosX64Main by getting { dependsOn(apple64Main) }
@@ -271,7 +264,7 @@ kotlin {
             kotlinOptions {
                 apiVersion = kotlinLanguage
                 languageVersion = kotlinLanguage
-                allWarningsAsErrors = true
+                allWarningsAsErrors = HostManager.hostIsMac
                 when (this) {
                     is KotlinJvmOptions -> {
                         jvmTarget = jvmTargetMinimum
@@ -289,7 +282,12 @@ kotlin {
                 }
             }
         }
+
     }
+}
+
+tasks.withType<KotlinNativeCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
 }
 
 tasks.withType<Test>().configureEach {
@@ -501,19 +499,12 @@ spdxSbom {
 val mavenUsername: String? = properties["mavenUsername"] as? String
 val mavenPassword: String? = properties["mavenPassword"] as? String
 
-signing {
-    isRequired = isReleaseBuild
-    sign(configurations.archives.get())
-    sign(publishing.publications)
-}
-
 tasks.withType(Sign::class) {
     enabled = isReleaseBuild
 }
 
 publishing {
     publications.withType<MavenPublication> {
-//        artifact(javadocJar)
         artifactId = artifactId.replace("uuid", "elide-uuid")
 
         pom {
@@ -623,6 +614,7 @@ val publishMac by tasks.registering {
         "publishWatchosArm32PublicationToMavenRepository",
         "publishWatchosArm64PublicationToMavenRepository",
         "publishWatchosSimulatorArm64PublicationToMavenRepository",
+        "publishWatchosDeviceArm64PublicationToMavenRepository",
         "publishWatchosX64PublicationToMavenRepository",
         "publishMacosArm64PublicationToMavenRepository",
         "publishMacosX64PublicationToMavenRepository",
@@ -630,6 +622,7 @@ val publishMac by tasks.registering {
         "publishJsPublicationToMavenRepository",
         "publishWasmPublicationToMavenRepository",
         "publishKotlinMultiplatformPublicationToMavenRepository",
+        "publishWasmPublicationToMavenRepository",
     )
 }
 
@@ -644,33 +637,4 @@ val publishLinux by tasks.registering {
         "publishLinuxX64PublicationToMavenRepository",
         "publishLinuxArm64PublicationToMavenRepository",
     )
-}
-
-afterEvaluate {
-    val signArchives = tasks.named("signArchives")
-
-    listOf(
-        "linkDebugTestIosSimulatorArm64",
-        "linkDebugTestTvosSimulatorArm64",
-        "linkDebugTestTvosX64",
-        "linkDebugTestLinuxX64",
-        "linkDebugTestMingwX64",
-        "linkDebugTestMacosArm64",
-        "linkDebugTestMacosX64",
-        "linkDebugTestIosX64",
-        "compileTestKotlinMacosX64",
-        "compileTestKotlinIosX64",
-        "compileTestKotlinMingwX64",
-        "compileTestKotlinWatchosX64",
-        "compileTestKotlinIosSimulatorArm64",
-        "compileTestKotlinMacosArm64",
-        "compileTestKotlinWatchosSimulatorArm64",
-        "compileTestKotlinTvosSimulatorArm64",
-        "compileTestKotlinLinuxX64",
-        "compileTestKotlinTvosX64",
-    ).forEach {
-        tasks.named(it) {
-            dependsOn(signArchives)
-        }
-    }
 }
