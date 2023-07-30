@@ -96,32 +96,6 @@ jobs:
       contents: read
       security-events: write
 
-  review:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    name: "Analysis: Auto-Review"
-    needs: ["build"]
-    continue-on-error: true
-    steps:
-      - name: "Setup: Checkout"
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 2
-      - name: "Auto PR Review"
-        uses: microsoft/gpt-review@0.1.2
-        continue-on-error: true
-        with:
-          GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ORG_KEY: ${{ secrets.OPENAI_ORG_ID }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          REPOSITORY_NAME: ${{ github.repository }}
-          AZURE_OPENAI_API: ${{ secrets.AZURE_OPENAI_API }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-
   publish-sandbox:
     permissions: write-all
     name: "Publish: Sandbox"
