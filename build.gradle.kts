@@ -131,7 +131,12 @@ kotlin {
             nodejs()
         }
         jvm {
-            jvmToolchain(jvmTargetMinimum.toIntOrNull() ?: defaultJavaToolchain)
+            withJava()
+            withSourcesJar(publish = true)
+            jvmToolchain {
+                languageVersion.set(JavaLanguageVersion.of(20))
+                vendor.set(JvmVendorSpec.AZUL)
+            }
 
             compilations.all {
                 kotlinOptions {
@@ -314,6 +319,12 @@ rootProject.plugins.withType(YarnPlugin::class.java) {
     rootProject.the<YarnRootExtension>().yarnLockAutoReplace = true
 }
 
+val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(tasks.dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(tasks.dokkaHtml.get().outputDirectory)
+}
+
 val ktlintConfig: Configuration by configurations.creating
 
 dependencies {
@@ -443,14 +454,6 @@ plugins.withType(io.gitlab.arturbosch.detekt.DetektPlugin::class) {
     }
 }
 
-//tasks.withType<DokkaTask> {
-//    dokkaSourceSets {
-//        named("commonMain") {
-//            samples.from("src/commonTest/kotlin")
-//        }
-//    }
-//}
-
 if (lockDeps == "true") {
     dependencyLocking {
         lockAllConfigurations()
@@ -517,7 +520,19 @@ tasks.withType(Sign::class) {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/elide-dev/uuid")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
     publications.withType<MavenPublication> {
+        artifact(javadocsJar)
         artifactId = artifactId.replace("uuid", "elide-uuid")
 
         pom {
@@ -562,16 +577,8 @@ val reports: TaskProvider<Task> = tasks.register("reports") {
     )
 }
 
-val allTests: TaskProvider<Task> = tasks.named("allTests")
-val test: Task = tasks.create("test") {
-    dependsOn(
-        allTests,
-    )
-}
-
 val check: TaskProvider<Task> = tasks.named("check") {
     dependsOn(
-        test,
         ktlint,
         tasks.apiCheck,
         tasks.koverVerify,
