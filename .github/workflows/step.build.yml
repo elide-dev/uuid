@@ -24,6 +24,10 @@ on:
         required: false
         type: boolean
         default: true
+      provenance:
+        required: false
+        type: boolean
+        default: true
       experimental:
         required: false
         type: boolean
@@ -108,6 +112,7 @@ jobs:
             ${{ inputs.flags }}
       - name: "Build: Provenance Subject"
         id: hash
+        if: inputs.provenance
         run: |
           echo "hashes=$(sha256sum ./build/libs/* | base64 -w0)" >> "$GITHUB_OUTPUT"
       - name: "Analysis: Build Reports"
@@ -128,6 +133,7 @@ jobs:
   provenance:
     name: Provenance
     needs: [build]
+    if: inputs.provenance
     permissions:
       actions: read
       id-token: write
