@@ -54,7 +54,7 @@ plugins {
     `project-report`
     `maven-publish`
     distribution
-//    signing
+    signing
 }
 
 val defaultJavaToolchain: Int = 11
@@ -501,11 +501,11 @@ spdxSbom {
 val mavenUsername: String? = properties["mavenUsername"] as? String
 val mavenPassword: String? = properties["mavenPassword"] as? String
 
-//signing {
-//    isRequired = isReleaseBuild
-//    sign(configurations.archives.get())
-//    sign(publishing.publications)
-//}
+signing {
+    isRequired = isReleaseBuild
+    sign(configurations.archives.get())
+    sign(publishing.publications)
+}
 
 tasks.withType(Sign::class) {
     enabled = isReleaseBuild
@@ -644,4 +644,33 @@ val publishLinux by tasks.registering {
         "publishLinuxX64PublicationToMavenRepository",
         "publishLinuxArm64PublicationToMavenRepository",
     )
+}
+
+afterEvaluate {
+    val signArchives = tasks.named("signArchives")
+
+    listOf(
+        "linkDebugTestIosSimulatorArm64",
+        "linkDebugTestTvosSimulatorArm64",
+        "linkDebugTestTvosX64",
+        "linkDebugTestLinuxX64",
+        "linkDebugTestMingwX64",
+        "linkDebugTestMacosArm64",
+        "linkDebugTestMacosX64",
+        "linkDebugTestIosX64",
+        "compileTestKotlinMacosX64",
+        "compileTestKotlinIosX64",
+        "compileTestKotlinMingwX64",
+        "compileTestKotlinWatchosX64",
+        "compileTestKotlinIosSimulatorArm64",
+        "compileTestKotlinMacosArm64",
+        "compileTestKotlinWatchosSimulatorArm64",
+        "compileTestKotlinTvosSimulatorArm64",
+        "compileTestKotlinLinuxX64",
+        "compileTestKotlinTvosX64",
+    ).forEach {
+        tasks.named(it) {
+            dependsOn(signArchives)
+        }
+    }
 }
