@@ -1,8 +1,18 @@
 # A Kotlin Multiplatform UUID
 
-[![Maven Central](https://img.shields.io/maven-central/v/dev.elide/uuid.svg?label=mavenCentral%28%29)](https://search.maven.org/artifact/dev.elide/uuid)
-[![Build](https://github.com/elide-dev/uuid/actions/workflows/step.build.yml/badge.svg)](https://github.com/elide-dev/uuid/actions/workflows/step.build.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.elide/elide-uuid.svg?label=mavenCentral%28%29)](https://search.maven.org/artifact/dev.elide/elide-uuid)
+[![CI](https://github.com/elide-dev/uuid/actions/workflows/pr.yml/badge.svg)](https://github.com/elide-dev/uuid/actions/workflows/pr.yml)
+[![Elide](https://elide.dev/shield)](https://elide.dev)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-WASM-yellow.svg?logo=kotlin&logoColor=yellow)](http://kotlinlang.org)
+[![Kotlin/JS. IR supported](https://img.shields.io/badge/kotlin-IR-yellow?logo=kotlin&logoColor=yellow)](https://kotl.in/jsirsupported)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=elide-dev_uuid&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=elide-dev_uuid&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=elide-dev_uuid&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=elide-dev_uuid&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=elide-dev_uuid&metric=bugs)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Felide-dev%2Fuuid.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Felide-dev%2Fuuid?ref=badge_shield)
 
 K/N doesn't have a UUID yet. This brings a UUID that matches UUIDs on various platforms:
 
@@ -22,10 +32,27 @@ K/N doesn't have a UUID yet. This brings a UUID that matches UUIDs on various pl
 In your build.gradle(.kts):
 
 - Add `mavenCentral()` to your repositories
-- Add `implementation "dev.elide:uuid:<version>"` as a dependency in your `commonMain` `sourceSets`.
+- Add `implementation "dev.elide:elide-uuid:<version>"` as a dependency in your `commonMain` `sourceSets`
 
-This library publishes gradle module metadata. If you're using Gradle prior to version 6, you should have `enableFeaturePreview("GRADLE_METADATA")` in your settings.gradle(.kts).
+This library publishes Gradle module metadata. If you're using Gradle prior to version 6, you should have `enableFeaturePreview("GRADLE_METADATA")` in your settings.gradle(.kts).
 
-### Future Goals
+### Contributing
 
-- Develop UUID functionality that can be contributed back to the Kotlin stdlib (see latest issues, PRs, and CHANGELOG.md for updates)
+Contributions are welcome! Once you file a PR, a bot will as you to sign the CLA (_Contributor License Agreement_) and to sign off your commits to establish your DCO
+(_Developer Certificate of Origin_).
+
+Checks run automatically on each PR. Review is requested automatically once your PR goes from draft to open.
+
+### Additional checks
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=elide-dev_uuid)](https://sonarcloud.io/summary/new_code?id=elide-dev_uuid)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Felide-dev%2Fuuid.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Felide-dev%2Fuuid?ref=badge_large)
+
+#### This is a fork
+
+Ben Asher's original library is [here](https://github.com/benasher44/uuid.git).
+
+#### About Elide
+
+This library is part of a larger polyglot framework and runtime called [Elide](https://github.com/elide-dev). You can learn more about Elide at [`elide.dev`](https://elide.dev).
