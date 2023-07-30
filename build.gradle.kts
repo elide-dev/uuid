@@ -430,13 +430,13 @@ listOf(
     }
 }
 
-sonarqube {
+sonar {
     properties {
         listOf(
             "sonar.projectKey" to "elide-dev_uuid",
             "sonar.organization" to "elide-dev",
             "sonar.host.url" to "https://sonarcloud.io",
-            "sonar.coverage.jacoco.xmlReportPaths" to "${project.rootDir}/build/reports/kover/xml/report.xml",
+            "sonar.coverage.jacoco.xmlReportPaths" to "${project.rootDir}/build/reports/kover/report.xml",
         ).forEach { (key, value) ->
             property(key, value)
         }

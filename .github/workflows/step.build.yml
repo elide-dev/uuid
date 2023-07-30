@@ -104,6 +104,7 @@ jobs:
           arguments: |
             preMerge
             -PVERSION=1.0-SNAPSHOT
+            -PsonarScan=true
             --scan
             --no-daemon
             --warning-mode=none
@@ -125,9 +126,12 @@ jobs:
             build/reports/
             build/spdx/
             build/test-results/
-      - name: "Analysis: Coverage"
-        if: ${{ inputs.coverage }}
+      - name: "Report: Codecov (Server)"
+        if: inputs.coverage
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./build/reports/kover/report.xml
 
   ## Report: Provenance
   provenance:
