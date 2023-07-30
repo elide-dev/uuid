@@ -30,7 +30,7 @@ task javadocsJar(type: Jar, dependsOn: dokkaHtml) {
 
 publishing {
   publications.all {
-//    artifact javadocsJar
+    artifact javadocsJar
 
     pom.withXml {
       def root = asNode()
@@ -70,6 +70,16 @@ publishing {
         credentials {
           username getRepositoryUsername()
           password getRepositoryPassword()
+        }
+      }
+    }
+    maven {
+      name "GitHubPackages"
+      url "https://maven.pkg.github.com/elide-dev/uuid"
+      if (getRepositoryUsername() != null) {
+        credentials {
+          username System.getenv("GITHUB_ACTOR")
+          password System.getenv("GITHUB_TOKEN")
         }
       }
     }
