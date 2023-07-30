@@ -22,7 +22,9 @@ package dev.elide.uuid
  * @constructor Constructs a new UUID from the given ByteArray
  * @throws IllegalArgumentException, if uuid.count() is not 16
  */
-public actual class Uuid @Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidOf(uuid)")) constructor(internal val uuidBytes: ByteArray) : Comparable<Uuid> {
+public actual class Uuid
+@Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidOf(uuid)"))
+constructor(internal val uuidBytes: ByteArray) : Comparable<Uuid> {
 
     @Suppress("DEPRECATION")
     public actual constructor(msb: Long, lsb: Long) : this(fromBits(msb, lsb))
@@ -76,7 +78,7 @@ public actual class Uuid @Deprecated("Use `uuidOf` instead.", ReplaceWith("uuidO
             4 until 6,
             6 until 8,
             8 until 10,
-            10 until 16
+            10 until 16,
         )
     }
 
@@ -143,6 +145,7 @@ public actual val Uuid.version: Int
  * @return Itself after setting the [Uuid.variant] and [Uuid.version].
  */
 @Suppress("NOTHING_TO_INLINE")
+// @kotlin.internal.InlineOnly
 internal inline fun ByteArray.setVersion(version: Int) = apply {
     this[6] = ((this[6].toInt() and 0x0F) or (version shl 4)).toByte()
     this[8] = ((this[8].toInt() and 0x3F) or 0x80).toByte()

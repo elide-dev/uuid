@@ -13,12 +13,8 @@
 
 package dev.elide.uuid
 
-@Deprecated("Use `Uuid` instead.", ReplaceWith("Uuid"))
-public typealias UUID = Uuid
+import kotlin.random.Random
 
-@Deprecated(
-    message = "Use uuidFrom() instead. This will be removed in the next release.",
-    replaceWith = ReplaceWith("Uuid.bytes")
-)
-public val Uuid.uuid: ByteArray
-    get() = bytes
+internal actual fun getRandomUuidBytes(): ByteArray = Random.Default.nextBytes(UUID_BYTES)
+
+internal actual fun <T> T.freeze(): T = this

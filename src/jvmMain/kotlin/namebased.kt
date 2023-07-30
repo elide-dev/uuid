@@ -45,7 +45,7 @@ public fun uuid5Of(namespace: Uuid, name: String): Uuid =
 
 private class JvmHasher(
     algorithmName: String,
-    override val version: Int
+    override val version: Int,
 ) : UuidHasher {
     private val digest = MessageDigest.getInstance(algorithmName)
 

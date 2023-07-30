@@ -11,8 +11,6 @@
  * License for the specific language governing permissions and limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package dev.elide.uuid
 
 import kotlinx.cinterop.UnsafeNumber

@@ -13,8 +13,12 @@
 
 package dev.elide.uuid
 
-import kotlin.native.FreezingIsDeprecated
-import kotlin.native.concurrent.freeze
+@Deprecated("Use `Uuid` instead.", ReplaceWith("Uuid"))
+public typealias UUID = Uuid
 
-@OptIn(FreezingIsDeprecated::class)
-internal actual fun <T> T.freeze() = this.freeze()
+@Deprecated(
+    message = "Use uuidFrom() instead. This will be removed in the next release.",
+    replaceWith = ReplaceWith("Uuid.bytes"),
+)
+public val Uuid.uuid: ByteArray
+    get() = bytes

@@ -11,7 +11,6 @@
  * License for the specific language governing permissions and limitations under the License.
  */
 
-@file:JvmName("UuidJvm")
 package dev.elide.uuid
 
 import java.nio.ByteBuffer
@@ -63,9 +62,13 @@ public actual fun uuidOf(bytes: ByteArray): Uuid {
 //   MSB/LSB approach. The reason for that has probably to do with how the JVM
 //   works and that such arrays always lead to heap allocations.
 public actual fun uuidFrom(string: String): Uuid =
-    if (string.length == 36) Uuid(string.segmentToLong(0, 19), string.segmentToLong(19, 36)) else throw IllegalArgumentException(
-        "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string"
-    )
+    if (string.length == 36) {
+        Uuid(string.segmentToLong(0, 19), string.segmentToLong(19, 36))
+    } else {
+        throw IllegalArgumentException(
+            "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string",
+        )
+    }
 
 private fun String.segmentToLong(start: Int, end: Int): Long {
     var result = 0L
@@ -96,7 +99,7 @@ private fun String.segmentToLong(start: Int, end: Int): Long {
                 'e', 'E' -> result += 14L
                 'f', 'F' -> result += 15L
                 else -> throw IllegalArgumentException(
-                    "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this"
+                    "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this",
                 )
             }
         }
