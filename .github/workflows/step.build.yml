@@ -16,14 +16,10 @@ on:
         required: false
         type: string
         default: "--no-configuration-cache"
-      gvm:
-        required: false
-        type: string
-        default: ${{ vars.GVM_VERSION }}
       java:
         required: false
         type: string
-        default: ${{ vars.JVM_VERSION }}
+        default: 20
       coverage:
         required: false
         type: boolean
@@ -64,11 +60,14 @@ jobs:
       checks: "write"
       pull-requests: "write"
 
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+
     steps:
       - name: "Setup: Checkout"
         uses: actions/checkout@v3
       - name: "Setup: Cache"
-        uses: actions/cache@v3
+        uses: buildjet/cache@v3
         with:
           key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
           restore-keys: |
@@ -77,12 +76,11 @@ jobs:
             ~/.sonar/cache
             ~/.konan
             ~/.gradle/caches
-      - name: "Setup: GraalVM"
-        uses: graalvm/setup-graalvm@v1
+      - name: "Setup: Zulu 20"
+        uses: buildjet/setup-java@v3
         with:
-          version: ${{ inputs.gvm }}
-          java-version: ${{ inputs.java }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'zulu'
+          java-version: '20'
       - name: "Build and Test"
         uses: gradle/gradle-build-action@v2
         id: gradlebuild
@@ -91,6 +89,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta' }}
           gradle-version: wrapper
           gradle-home-cache-cleanup: true
+          dependency-graph: generate
           gradle-home-cache-includes: |
             caches
             notifications
@@ -107,6 +106,10 @@ jobs:
             --dependency-verification=lenient
             -Pci=true
             ${{ inputs.flags }}
+      - name: "Build: Provenance Subject"
+        id: hash
+        run: |
+          echo "hashes=$(sha256sum ./build/libs/* | base64 -w0)" >> "$GITHUB_OUTPUT"
       - name: "Analysis: Build Reports"
         uses: actions/upload-artifact@v3
         if: failure() || success()
@@ -120,3 +123,16 @@ jobs:
       - name: "Analysis: Coverage"
         if: ${{ inputs.coverage }}
         uses: codecov/codecov-action@v3
+
+  ## Report: Provenance
+  provenance:
+    name: Provenance
+    needs: [build]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.7.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: false

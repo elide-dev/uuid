@@ -23,7 +23,8 @@ jobs:
     name: "Build (${{ matrix.label }})"
 
     permissions:
-      contents: "read"
+      actions: "read"
+      contents: "write"
       id-token: "write"
       checks: "write"
       pull-requests: "write"
@@ -66,7 +67,6 @@ jobs:
       label: ${{ matrix.label }}
       flags: ${{ matrix.flags }}
       experimental: ${{ matrix.experimental }}
-      gvm: ${{ matrix.gvm }}
       java: ${{ matrix.java }}
       coverage: ${{ matrix.coverage }}
 

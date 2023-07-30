@@ -115,10 +115,13 @@ jobs:
       id-token: write
       contents: read
 
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+
     strategy:
       fail-fast: false
       matrix:
-        runner: [macOS-latest, windows-latest-8-cores, ubuntu-latest-4-cores]
+        runner: [macOS-latest, windows-latest, ubuntu-latest]
         include:
           - runner: macOS-latest
             flags: "--no-configuration-cache"
@@ -127,14 +130,14 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             target: publishMac
-          - runner: windows-latest-8-cores
+          - runner: windows-latest
             flags: "--no-configuration-cache"
             os: "windows"
             label: "Windows"
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             target: publishWindows
-          - runner: ubuntu-latest-4-cores
+          - runner: ubuntu-latest
             flags: "--no-configuration-cache"
             os: "linux"
             label: "Linux"
@@ -146,7 +149,7 @@ jobs:
       - name: "Setup: Checkout"
         uses: actions/checkout@v3
       - name: "Setup: Cache"
-        uses: actions/cache@v3
+        uses: buildjet/cache@v3
         with:
           key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
           restore-keys: |
@@ -166,12 +169,11 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
           version: '${{ vars.GCLOUD_VERSION }}'
-      - name: "Setup: GraalVM"
-        uses: graalvm/setup-graalvm@v1
+      - name: "Setup: Zulu 20"
+        uses: buildjet/setup-java@v3
         with:
-          version: ${{ matrix.gvm }}
-          java-version: ${{ matrix.java }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'zulu'
+          java-version: '20'
       - name: "Publish (${{ matrix.label }})"
         uses: gradle/gradle-build-action@v2
         id: publish
@@ -179,6 +181,7 @@ jobs:
           cache-read-only: true
           gradle-version: wrapper
           gradle-home-cache-cleanup: true
+          dependency-graph: generate-and-submit
           gradle-home-cache-includes: |
             caches
             notifications
@@ -198,6 +201,10 @@ jobs:
             --${{ inputs.logLevel }}
             ${{ inputs.flags }}
             ${{ matrix.flags }}
+      - name: "Build: Provenance Subject"
+        id: hash
+        run: |
+          echo "hashes=$(sha256sum ./build/libs/* | base64 -w0)" >> "$GITHUB_OUTPUT"
       - name: "Artifacts: Libraries"
         uses: actions/upload-artifact@v3
         if: failure() || success()
@@ -210,6 +217,19 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure() || success()
         with:
-          name: libraries
+          name: reports
           path: |
             build/reports/
+
+  ## Report: Provenance
+  provenance:
+    name: Provenance
+    needs: [publish]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.7.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true
