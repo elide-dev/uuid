@@ -74,7 +74,7 @@ publishing {
       }
     }
     maven {
-      name "GitHubPackages"
+      name = "GitHubPackages"
       url "https://maven.pkg.github.com/elide-dev/uuid"
       if (getRepositoryUsername() != null) {
         credentials {
