@@ -1,4 +1,16 @@
-@file:JvmName("UuidJvm")
+/*
+ * Copyright (c) 2023 Elide Ventures, LLC.
+ *
+ * Licensed under the MIT license (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ *   https://opensource.org/license/mit/
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under the License.
+ */
+
 package dev.elide.uuid
 
 import java.nio.ByteBuffer
@@ -50,9 +62,13 @@ public actual fun uuidOf(bytes: ByteArray): Uuid {
 //   MSB/LSB approach. The reason for that has probably to do with how the JVM
 //   works and that such arrays always lead to heap allocations.
 public actual fun uuidFrom(string: String): Uuid =
-    if (string.length == 36) Uuid(string.segmentToLong(0, 19), string.segmentToLong(19, 36)) else throw IllegalArgumentException(
-        "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string"
-    )
+    if (string.length == 36) {
+        Uuid(string.segmentToLong(0, 19), string.segmentToLong(19, 36))
+    } else {
+        throw IllegalArgumentException(
+            "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string",
+        )
+    }
 
 private fun String.segmentToLong(start: Int, end: Int): Long {
     var result = 0L
@@ -83,7 +99,7 @@ private fun String.segmentToLong(start: Int, end: Int): Long {
                 'e', 'E' -> result += 14L
                 'f', 'F' -> result += 15L
                 else -> throw IllegalArgumentException(
-                    "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this"
+                    "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this",
                 )
             }
         }

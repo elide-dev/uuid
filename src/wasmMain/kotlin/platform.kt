@@ -13,7 +13,8 @@
 
 package dev.elide.uuid
 
-import kotlin.native.concurrent.freeze
+import kotlin.random.Random
 
-@OptIn(FreezingIsDeprecated::class)
-internal actual fun <T> T.freeze() = this.freeze()
+internal actual fun getRandomUuidBytes(): ByteArray = Random.Default.nextBytes(UUID_BYTES)
+
+internal actual fun <T> T.freeze(): T = this

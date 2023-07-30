@@ -13,7 +13,7 @@ public abstract interface class dev/elide/uuid/UuidHasher {
 	public abstract fun update ([B)V
 }
 
-public final class dev/elide/uuid/UuidJvm {
+public final class dev/elide/uuid/UuidKt {
 	public static final fun getBytes (Ljava/util/UUID;)[B
 	public static final fun getVariant (Ljava/util/UUID;)I
 	public static final fun getVersion (Ljava/util/UUID;)I

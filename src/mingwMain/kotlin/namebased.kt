@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2023 Elide Ventures, LLC.
+ *
+ * Licensed under the MIT license (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ *   https://opensource.org/license/mit/
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under the License.
+ */
+
 package dev.elide.uuid
 
 import kotlinx.cinterop.addressOf
@@ -54,7 +67,7 @@ public fun uuid5Of(namespace: Uuid, name: String): Uuid =
 
 private class MingwHasher(
     private val algorithmName: String,
-    override val version: Int
+    override val version: Int,
 ) : UuidHasher {
     private var data = ByteArray(0)
 
@@ -72,7 +85,7 @@ private class MingwHasher(
             val pbHashObj = alloc<PBYTEVar>()
 
             try {
-                var status = BCryptOpenAlgorithmProvider(alg.ptr, algorithmName, null, 0)
+                var status = BCryptOpenAlgorithmProvider(alg.ptr, algorithmName, null, 0u)
                 check(status >= 0) { "BCryptOpenAlgorithmProvider failed with code $status" }
 
                 val cbHashObj = alloc<DWORDVar>()
@@ -83,12 +96,12 @@ private class MingwHasher(
                     cbHashObj.reinterpret<UCHARVar>().ptr,
                     sizeOf<DWORDVar>().toUInt(),
                     cbData.ptr,
-                    0
+                    0u,
                 )
                 check(status >= 0) { "BCryptGetProperty for KeyObjectLength failed with code $status" }
 
                 pbHashObj.value =
-                    HeapAlloc(GetProcessHeap()?.reinterpret(), 0, cbHashObj.value.toULong())?.reinterpret()
+                    HeapAlloc(GetProcessHeap()?.reinterpret(), 0u, cbHashObj.value.toULong())?.reinterpret()
                 check(pbHashObj.value != null) { "HeapAlloc (1) failed" }
 
                 val cbHash = alloc<DWORDVar>()
@@ -98,33 +111,33 @@ private class MingwHasher(
                     cbHash.reinterpret<UCHARVar>().ptr,
                     sizeOf<DWORDVar>().toUInt(),
                     cbData.ptr,
-                    0
+                    0u,
                 )
                 check(status >= 0) { "BCryptGetProperty for HashDigestLength failed with code $status" }
 
-                status = BCryptCreateHash(alg.value, hash.ptr, pbHashObj.value, cbHashObj.value, null, 0, 0)
+                status = BCryptCreateHash(alg.value, hash.ptr, pbHashObj.value, cbHashObj.value, null, 0u, 0u)
                 check(status >= 0) { "BCryptCreateHash failed with code $status" }
 
                 data.usePinned {
-                    status = BCryptHashData(hash.value, it.addressOf(0).reinterpret(), data.size.toUInt(), 0)
+                    status = BCryptHashData(hash.value, it.addressOf(0).reinterpret(), data.size.toUInt(), 0u)
                 }
                 check(status >= 0) { "BCryptHashData failed with code $status" }
 
                 ByteArray(cbHash.value.toInt()).also { bytes ->
                     bytes.usePinned {
-                        status = BCryptFinishHash(hash.value, it.addressOf(0).reinterpret(), cbHash.value, 0)
+                        status = BCryptFinishHash(hash.value, it.addressOf(0).reinterpret(), cbHash.value, 0u)
                     }
                     check(status >= 0) { "BCryptFinishHash failed with code $status" }
                 }
             } finally {
                 if (alg.value != null) {
-                    BCryptCloseAlgorithmProvider(alg.value, 0)
+                    BCryptCloseAlgorithmProvider(alg.value, 0u)
                 }
                 if (hash.value != null) {
                     BCryptDestroyHash(hash.value)
                 }
                 if (pbHashObj.value != null) {
-                    HeapFree(GetProcessHeap(), 0, pbHashObj.value)
+                    HeapFree(GetProcessHeap(), 0u, pbHashObj.value)
                 }
             }
         }

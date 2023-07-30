@@ -1,6 +1,24 @@
+/*
+ * Copyright (c) 2023 Elide Ventures, LLC.
+ *
+ * Licensed under the MIT license (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ *   https://opensource.org/license/mit/
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under the License.
+ */
+
+@file:kotlin.jvm.JvmName("UuidUtil")
 @file:Suppress("MemberVisibilityCanBePrivate")
 
 package dev.elide.uuid
+
+import kotlin.experimental.and
+import kotlin.experimental.or
+import kotlin.native.concurrent.SharedImmutable
 
 // Number of bytes in a UUID
 internal const val UUID_BYTES = 16
@@ -8,9 +26,28 @@ internal const val UUID_BYTES = 16
 // Number of characters in a UUID string
 internal const val UUID_STRING_LENGTH = 36
 
+// Ranges of non-hyphen characters in a UUID string
+@SharedImmutable
+internal val UUID_CHAR_RANGES: List<IntRange> = listOf(
+    0 until 8,
+    9 until 13,
+    14 until 18,
+    19 until 23,
+    24 until 36,
+)
+
+// Indices of the hyphen characters in a UUID string
+@SharedImmutable
+internal val UUID_HYPHEN_INDICES = listOf(8, 13, 18, 23)
+
+// UUID chars arranged from smallest to largest, so they can be indexed by their byte representations
+@SharedImmutable
+internal val UUID_CHARS = ('0'..'9') + ('a'..'f')
+
 /**
  * A RFC4122 UUID
  */
+// @SinceKotlin("1.x")
 public expect class Uuid : Comparable<Uuid> {
 
     /**
@@ -19,6 +56,7 @@ public expect class Uuid : Comparable<Uuid> {
      * @param msb The 64 most significant bits of the [Uuid].
      * @param lsb The 64 least significant bits of the [Uuid].
      */
+    // @SinceKotlin("1.x")
     public constructor(msb: Long, lsb: Long)
 
     /** The most significant 64 bits of this UUID's 128 bit value. */
@@ -29,6 +67,7 @@ public expect class Uuid : Comparable<Uuid> {
 }
 
 /** Gets the raw UUID bytes */
+// @SinceKotlin("1.x")
 public expect val Uuid.bytes: ByteArray
 
 /**
@@ -40,9 +79,10 @@ public expect val Uuid.bytes: ByteArray
  * - **`7`** – reserved for future extension
  *
  * @return The variant number of this [Uuid].
- * @sample dev.elide.uuid.UuidTest.variants
+ * @sample com.benasher44.uuid.UuidTest.variants
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.1.1">RFC 4122: Section 4.1.1</a>
  */
+// @SinceKotlin("1.x")
 public expect val Uuid.variant: Int
 
 /**
@@ -60,9 +100,10 @@ public expect val Uuid.variant: Int
  * [RFC 4122](https://tools.ietf.org/html/rfc4122).
  *
  * @return The version number of this [Uuid].
- * @sample dev.elide.uuid.UuidTest.versions
+ * @sample com.benasher44.uuid.UuidTest.versions
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.1.3">RFC 4122: Section 4.1.3</a>
  */
+// @SinceKotlin("1.x")
 public expect val Uuid.version: Int
 
 /**
@@ -70,12 +111,14 @@ public expect val Uuid.version: Int
  *
  * @param from The [String] representation of the UUID
  */
+// @SinceKotlin("1.x")
 public expect fun uuidFrom(string: String): Uuid
 
 /**
  * Constructs a new [Uuid] from the given [bytes]
  * @throws IllegalArgumentException, if bytes.count() is not 16
  */
+// @SinceKotlin("1.x")
 public expect fun uuidOf(bytes: ByteArray): Uuid
 
 /**
@@ -89,9 +132,10 @@ public expect fun uuidOf(bytes: ByteArray): Uuid
  * source of the platform.
  *
  * @return New version 4 [UUID][Uuid] of random data.
- * @sample dev.elide.uuid.UuidTest.uuid4_generation
+ * @sample com.benasher44.uuid.UuidTest.uuid4_generation
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.4">RFC 4122: Section 4.4</a>
  */
+// @SinceKotlin("1.x")
 public expect fun uuid4(): Uuid
 
 /**
@@ -118,4 +162,35 @@ public interface UuidHasher {
      * @note The hasher should not be used after this call
      */
     public fun digest(): ByteArray
+}
+
+/**
+ * Constructs a "Name-Based" version 3 or 5 [UUID][Uuid].
+ *
+ * Version 3 and 5 UUIDs are created by combining a name and
+ * a namespace using a hash function. This library may provide
+ * such hash functions in the future, but it adds a significant
+ * maintenance burden to support for native, JS, and JVM. Until then:
+ *
+ * - Provide a MD5 [UuidHasher] to get a v3 UUID
+ * - Provide a SHA-1 [UuidHasher] to get a v5 UUID
+ *
+ * @param namespace for the "Name-Based" UUID
+ * @param name withing the namespace for the "Name-Based" UUID
+ * @param hasher interface that implements a hashing algorithm
+ * @return New version 3 or 5 [UUID][Uuid].
+ * @sample com.benasher44.uuid.uuid5Of
+ * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.3">RFC 4122: Section 4.3</a>
+ */
+public fun nameBasedUuidOf(namespace: Uuid, name: String, hasher: UuidHasher): Uuid {
+    hasher.update(namespace.bytes)
+    hasher.update(name.encodeToByteArray())
+    val hashedBytes = hasher.digest()
+    hashedBytes[6] = hashedBytes[6]
+        .and(0b00001111) // clear the 4 most sig bits
+        .or(hasher.version.shl(4).toByte())
+    hashedBytes[8] = hashedBytes[8]
+        .and(0b00111111) // clear the 2 most sig bits
+        .or(-0b10000000) // set 2 most sig to 10
+    return uuidOf(hashedBytes.copyOf(UUID_BYTES))
 }

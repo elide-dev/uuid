@@ -1,16 +1,20 @@
 [versions]
-kotlin = "1.8.21"
-kover = "0.6.1"
-kotlinx_benchmark = "0.4.7"
-kotlinx_apiValidator = "0.12.1"
+kotlin = "1.9.0"
+kover = "0.7.3"
+kotlinx_benchmark = "0.4.8"
+kotlinx_apiValidator = "0.13.2"
 ktlint = "0.42.1"
-detekt = "1.22.0-RC3"
-sonar = "4.0.0.2929"
+detekt = "1.23.0"
+sonar = "4.3.0.3225"
 dokka = "1.8.10"
 doctor = "0.8.1"
-versionCheck = "0.46.0"
+versionCheck = "0.47.0"
 testlogger = "3.2.0"
 nexus = "1.3.0"
+sigstore = "0.4.2"
+spdx = "0.1.0"
+cyclonedx = "1.7.4"
+dependency_analysis = "1.20.0"
 
 [plugins]
 nexus = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus" }
@@ -23,6 +27,10 @@ kotlinx_benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kot
 kotlinx_apiValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx_apiValidator" }
 sonar = { id = "org.sonarqube", version.ref = "sonar" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+spdx_sbom = { id = "org.spdx.sbom", version.ref = "spdx" }
+cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
+sigstore = { id = "dev.sigstore.sign", version.ref = "sigstore" }
+dependency_analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency_analysis" }
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck" }
 
 [libraries]
