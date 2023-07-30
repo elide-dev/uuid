@@ -1,16 +1,3 @@
-/*
- * Copyright (c) 2023 Elide Ventures, LLC.
- *
- * Licensed under the MIT license (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- *   https://opensource.org/license/mit/
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under the License.
- */
-
 package dev.elide.uuid
 
 import kotlin.test.Test
@@ -65,7 +52,7 @@ class UuidTest {
     fun parsing_throws_when_passed_invalid_length_of_string() {
         assertFailsWith<IllegalArgumentException>(
             message = "Uuid string has invalid length: c480d6ab-cb0c-427b-a9a6",
-            block = { uuidFrom("c480d6ab-cb0c-427b-a9a6") }
+            block = { uuidFrom("c480d6ab-cb0c-427b-a9a6") },
         )
     }
 
@@ -73,7 +60,7 @@ class UuidTest {
     fun parsing_throws_when_passed_invalid_format_of_string() {
         assertFailsWith<IllegalArgumentException>(
             message = "Uuid string has invalid format: c480d6abcb0c427ba9a619c5f8a146bd",
-            block = { uuidFrom("c480d6abcb0c427ba9a619c5f8a146bd") }
+            block = { uuidFrom("c480d6abcb0c427ba9a619c5f8a146bd") },
         )
     }
 
@@ -81,7 +68,7 @@ class UuidTest {
     fun parsing_throws_when_passed_invalid_characters_in_string() {
         assertFailsWith<IllegalArgumentException>(
             message = "Uuid string has invalid characters ghijklmn-opqr-stuv-wxyz-GHIJKLMNOPQR",
-            block = { uuidFrom("ghijklmn-opqr-stuv-wxyz-GHIJKLMNOPQR") }
+            block = { uuidFrom("ghijklmn-opqr-stuv-wxyz-GHIJKLMNOPQR") },
         )
     }
 

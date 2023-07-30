@@ -11,13 +11,12 @@
  * License for the specific language governing permissions and limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package dev.elide.uuid
 
 import kotlinx.cinterop.UIntVar
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
@@ -73,10 +72,10 @@ private fun loadString(path: String): String {
     val handle = CreateFileW(
         path,
         GENERIC_READ,
-        FILE_SHARE_READ.toUInt(),
+        FILE_SHARE_READ.convert(),
         null,
-        OPEN_EXISTING.toUInt(),
-        FILE_ATTRIBUTE_NORMAL.toUInt(),
+        OPEN_EXISTING.convert(),
+        FILE_ATTRIBUTE_NORMAL.convert(),
         null,
     )
     check(handle != INVALID_HANDLE_VALUE) { "Error: ${GetLastError()}" }

@@ -11,8 +11,6 @@
  * License for the specific language governing permissions and limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package dev.elide.uuid
 
 import kotlinx.cinterop.addressOf
@@ -53,7 +51,7 @@ public fun uuid5Of(namespace: Uuid, name: String): Uuid =
 
 private class AppleHasher(
     private val digestFunc: (ByteArray) -> ByteArray,
-    override val version: Int
+    override val version: Int,
 ) : UuidHasher {
     private var data = ByteArray(0)
 

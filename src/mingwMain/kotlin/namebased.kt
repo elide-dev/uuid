@@ -11,8 +11,6 @@
  * License for the specific language governing permissions and limitations under the License.
  */
 
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package dev.elide.uuid
 
 import kotlinx.cinterop.addressOf
@@ -69,7 +67,7 @@ public fun uuid5Of(namespace: Uuid, name: String): Uuid =
 
 private class MingwHasher(
     private val algorithmName: String,
-    override val version: Int
+    override val version: Int,
 ) : UuidHasher {
     private var data = ByteArray(0)
 
@@ -117,54 +115,29 @@ private class MingwHasher(
                 )
                 check(status >= 0) { "BCryptGetProperty for HashDigestLength failed with code $status" }
 
-                status = BCryptCreateHash(
-                    alg.value,
-                    hash.ptr,
-                    pbHashObj.value,
-                    cbHashObj.value,
-                    null,
-                    0u,
-                    0u,
-                )
+                status = BCryptCreateHash(alg.value, hash.ptr, pbHashObj.value, cbHashObj.value, null, 0u, 0u)
                 check(status >= 0) { "BCryptCreateHash failed with code $status" }
 
                 data.usePinned {
-                    status = BCryptHashData(
-                        hash.value,
-                        it.addressOf(0).reinterpret(),
-                        data.size.toUInt(),
-                        0u,
-                    )
+                    status = BCryptHashData(hash.value, it.addressOf(0).reinterpret(), data.size.toUInt(), 0u)
                 }
                 check(status >= 0) { "BCryptHashData failed with code $status" }
 
                 ByteArray(cbHash.value.toInt()).also { bytes ->
                     bytes.usePinned {
-                        status = BCryptFinishHash(
-                            hash.value,
-                            it.addressOf(0).reinterpret(),
-                            cbHash.value,
-                            0u,
-                        )
+                        status = BCryptFinishHash(hash.value, it.addressOf(0).reinterpret(), cbHash.value, 0u)
                     }
                     check(status >= 0) { "BCryptFinishHash failed with code $status" }
                 }
             } finally {
                 if (alg.value != null) {
-                    BCryptCloseAlgorithmProvider(
-                        alg.value,
-                        0u,
-                    )
+                    BCryptCloseAlgorithmProvider(alg.value, 0u)
                 }
                 if (hash.value != null) {
                     BCryptDestroyHash(hash.value)
                 }
                 if (pbHashObj.value != null) {
-                    HeapFree(
-                        GetProcessHeap(),
-                        0u,
-                        pbHashObj.value,
-                    )
+                    HeapFree(GetProcessHeap(), 0u, pbHashObj.value)
                 }
             }
         }
