@@ -506,7 +506,7 @@ tasks.cyclonedxBom {
 }
 
 tasks.build {
-    finalizedBy(tasks.spdxSbom)
+    finalizedBy("spdxSbomForRelease")
 }
 
 val mavenUsername: String? = properties["mavenUsername"] as? String

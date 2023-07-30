@@ -111,6 +111,10 @@ jobs:
     name: Publish
     runs-on: ${{ matrix.runner }}
 
+    permissions:
+      id-token: write
+      contents: read
+
     strategy:
       fail-fast: false
       matrix:
@@ -198,6 +202,14 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure() || success()
         with:
-          name: reports
+          name: libraries
           path: |
             build/libs/
+            build/spdx/
+      - name: "Artifacts: Reports"
+        uses: actions/upload-artifact@v3
+        if: failure() || success()
+        with:
+          name: libraries
+          path: |
+            build/reports/

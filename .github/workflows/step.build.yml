@@ -115,6 +115,7 @@ jobs:
           path: |
             build/api/
             build/reports/
+            build/spdx/
             build/test-results/
       - name: "Analysis: Coverage"
         if: ${{ inputs.coverage }}
