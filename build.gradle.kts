@@ -363,7 +363,10 @@ checkTask.configure {
 
 val projectDirGenRoot = "$buildDir/generated/projectdir/kotlin"
 val projectDirPath: String = projectDir.absolutePath
-val generateProjDirValTask: TaskProvider<Task> = tasks.register("generateProjectDirectoryVal") {
+val generateProjectDirectoryVal: TaskProvider<Task> by tasks.registering {
+    group = "build"
+    description = "Generate project directory build-time values"
+
     mkdir(projectDirGenRoot)
     val projDirFile = File("$projectDirGenRoot/projdir.kt")
     projDirFile.writeText("")
@@ -384,13 +387,13 @@ kotlin.sourceSets.named("commonTest") {
 // Ensure this runs before any test compile task
 tasks.withType<AbstractCompile>().configureEach {
     if (name.lowercase().contains("test")) {
-        dependsOn(generateProjDirValTask)
+        dependsOn(generateProjectDirectoryVal)
     }
 }
 
 tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
     if (name.lowercase().contains("test")) {
-        dependsOn(generateProjDirValTask)
+        dependsOn(generateProjectDirectoryVal)
     }
 }
 
@@ -461,7 +464,10 @@ if (lockDeps == "true") {
     }
 }
 
-val resolveAndLockAll: TaskProvider<Task> = tasks.register("resolveAndLockAll") {
+val resolveAndLockAll: TaskProvider<Task> by tasks.registering {
+    group = "build"
+    description = "Resolve and re-lock all dependencies"
+
     doFirst {
         require(gradle.startParameter.isWriteDependencyLocks)
     }
@@ -473,7 +479,10 @@ val resolveAndLockAll: TaskProvider<Task> = tasks.register("resolveAndLockAll") 
     }
 }
 
-tasks.register("relock") {
+val relock: TaskProvider<Task> by tasks.registering {
+    group = "build"
+    description = "Re-lock all dependencies"
+
     dependsOn(
         tasks.dependencies,
         resolveAndLockAll,
@@ -579,7 +588,7 @@ tasks.withType(AbstractPublishToMaven::class.java) {
     dependsOn(tasks.withType(Sign::class))
 }
 
-val reports: TaskProvider<Task> = tasks.register("reports") {
+val reports: TaskProvider<Task> by tasks.registering {
     dependsOn(
         tasks.koverXmlReport,
         tasks.dependencyReport,
@@ -587,7 +596,7 @@ val reports: TaskProvider<Task> = tasks.register("reports") {
     )
 }
 
-val check: TaskProvider<Task> = tasks.named("check") {
+val check: TaskProvider<Task> by tasks.registering {
     dependsOn(
         ktlint,
         tasks.apiCheck,
@@ -595,7 +604,7 @@ val check: TaskProvider<Task> = tasks.named("check") {
     )
 }
 
-tasks.create("preMerge") {
+val preMerge: TaskProvider<Task> by tasks.registering {
     listOfNotNull(
         tasks.build,
         tasks.check,
@@ -613,15 +622,6 @@ tasks.create("preMerge") {
 }
 
 afterEvaluate {
-    listOf(
-        "wasmTest",
-        "compileTestDevelopmentExecutableKotlinWasm",
-    ).forEach {
-        tasks.named(it).configure {
-            enabled = false
-        }
-    }
-
     cacheDisabledTasks.forEach {
         try {
             tasks.named(it).configure {
@@ -633,7 +633,7 @@ afterEvaluate {
     }
 }
 
-val publishMac by tasks.registering {
+val publishMac: TaskProvider<Task> by tasks.registering {
     dependsOn(
         "publishIosArm64PublicationToMavenRepository",
         "publishIosSimulatorArm64PublicationToMavenRepository",
@@ -656,13 +656,13 @@ val publishMac by tasks.registering {
     )
 }
 
-val publishWindows by tasks.registering {
+val publishWindows: TaskProvider<Task> by tasks.registering {
     dependsOn(
         "publishMingwX64PublicationToMavenRepository",
     )
 }
 
-val publishLinux by tasks.registering {
+val publishLinux: TaskProvider<Task> by tasks.registering {
     dependsOn(
         "publishLinuxX64PublicationToMavenRepository",
         "publishLinuxArm64PublicationToMavenRepository",
