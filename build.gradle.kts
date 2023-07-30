@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2023 Elide Ventures, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under the License.
+ */
+
 @file:Suppress(
     "unused",
     "DSL_SCOPE_VIOLATION",
@@ -30,6 +43,10 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.detekt)
     alias(libs.plugins.nexus)
+    alias(libs.plugins.spdx.sbom)
+    alias(libs.plugins.cyclonedx)
+    alias(libs.plugins.sigstore)
+    alias(libs.plugins.dependency.analysis)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.benchmark)
     alias(libs.plugins.kotlinx.apiValidator)
@@ -37,7 +54,7 @@ plugins {
     `project-report`
     `maven-publish`
     distribution
-    signing
+//    signing
 }
 
 val defaultJavaToolchain: Int = 11
@@ -48,6 +65,8 @@ val nodeVersion: String by properties
 val sonarScan: String by properties
 val GROUP: String by properties
 val VERSION: String by properties
+val enableSbom = false
+val enableCyclonedx = false
 
 group = GROUP
 version = VERSION
@@ -437,6 +456,7 @@ plugins.withType(io.gitlab.arturbosch.detekt.DetektPlugin::class) {
 if (lockDeps == "true") {
     dependencyLocking {
         lockAllConfigurations()
+        lockMode = LockMode.LENIENT
     }
 }
 
@@ -459,22 +479,33 @@ tasks.register("relock") {
     )
 }
 
-//val dokkaHtml by tasks.getting(DokkaTask::class)
+spdxSbom {
+    targets {
+        create("release") {
+            configurations.set(listOf("jvmCompileClasspath"))
 
-//val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-//    dependsOn(tasks.dokkaHtml)
-//    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
-//    archiveClassifier.set("javadoc")
-//}
+            scm {
+                uri.set("https://github.com/elide-dev/uuid")
+            }
+            // configure here
+            document {
+                name.set("Elide Multiplatform UUID")
+                namespace.set("https://elide.dev/spdx/F9B2EC53-49B0-41C7-A013-55FC4BA6B677")
+                creator.set("Person:Sam Gammon")
+                packageSupplier.set("Organization:Elide")
+            }
+        }
+    }
+}
 
 val mavenUsername: String? = properties["mavenUsername"] as? String
 val mavenPassword: String? = properties["mavenPassword"] as? String
 
-signing {
-    isRequired = isReleaseBuild
-    sign(configurations.archives.get())
-    sign(publishing.publications)
-}
+//signing {
+//    isRequired = isReleaseBuild
+//    sign(configurations.archives.get())
+//    sign(publishing.publications)
+//}
 
 tasks.withType(Sign::class) {
     enabled = isReleaseBuild
@@ -544,11 +575,15 @@ val check: TaskProvider<Task> = tasks.named("check") {
 }
 
 tasks.create("preMerge") {
-    dependsOn(
+    listOfNotNull(
         tasks.build,
         tasks.check,
+        if (enableSbom) tasks.spdxSbom else null,
+        if (enableCyclonedx) tasks.cyclonedxBom else null,
         reports,
-    )
+    ).forEach {
+        dependsOn(it)
+    }
     if (sonarScan == "true") {
         dependsOn(
             tasks.sonar,

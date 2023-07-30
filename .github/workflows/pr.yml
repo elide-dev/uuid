@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macOS-latest, windows-latest-8-cores, ubuntu-latest-4-cores]
+        runner: [macOS-latest, windows-latest, ubuntu-latest]
         include:
           - runner: macOS-latest
             flags: "--no-configuration-cache"
@@ -41,7 +41,7 @@ jobs:
             coverage: true
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
-          - runner: windows-latest-8-cores
+          - runner: windows-latest
             flags: "--no-configuration-cache"
             os: "windows"
             label: "Windows"
@@ -49,7 +49,7 @@ jobs:
             coverage: true
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
-          - runner: ubuntu-latest-4-cores
+          - runner: ubuntu-latest
             flags: "--no-configuration-cache -PsonarScan=true"
             os: "linux"
             label: "Linux"

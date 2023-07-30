@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2023 Elide Ventures, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under the License.
+ */
+
 @file:Suppress("MemberVisibilityCanBePrivate", "DuplicatedCode")
 
 package dev.elide.uuid
@@ -157,7 +170,6 @@ internal inline fun ByteArray.setVersion(version: Int): ByteArray {
 public actual fun uuidOf(bytes: ByteArray): Uuid = Uuid(bytes)
 
 /** Returns the Int representation of a given UUID character */
-@Suppress("DEPRECATION")
 private fun halfByteFromChar(char: Char) = when (char) {
     in '0'..'9' -> char.toInt() - 48
     in 'a'..'f' -> char.toInt() - 87
@@ -183,8 +195,10 @@ public actual fun uuidFrom(string: String): Uuid {
     return Uuid(bytes)
 }
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION", "CAST_NEVER_SUCCEEDS")
 public actual fun uuid4(): Uuid =
-    Uuid(getRandomUuidBytes().setVersion(4))
+    Uuid((getRandomUuidBytes() as ByteArray).setVersion(4))
 
-public external fun getRandomUuidBytes(): ByteArray
+public external interface TypedByteArray
+
+public external fun getRandomUuidBytes(): TypedByteArray
