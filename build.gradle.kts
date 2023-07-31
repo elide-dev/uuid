@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 plugins {
+    embeddedKotlin("multiplatform")
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.doctor)
@@ -46,7 +47,6 @@ plugins {
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.sigstore)
     alias(libs.plugins.dependency.analysis)
-    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.benchmark)
     alias(libs.plugins.kotlinx.apiValidator)
 
