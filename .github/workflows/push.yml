@@ -3,6 +3,9 @@ name: Push
 on:
   push:
     branches: [master, main, beta]
+    paths-ignore:
+      - README.md
+      - ./*.md
 
 env:
   CI: "true"

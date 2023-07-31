@@ -152,13 +152,12 @@ jobs:
       - name: "Setup: Cache"
         uses: buildjet/cache@v3
         with:
-          key: ${{ runner.os }}-gradle-${{ hashFiles('*.gradle.kts') }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-gradle-v2-${{ hashFiles('gradle/libs.versions.toml', '*.lockfile') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-gradle-v2-
           path: |
             ~/.sonar/cache
             ~/.konan
-            ~/.gradle/caches
       - id: 'auth'
         name: "Setup: GCS"
         if: ${{ inputs.gcs == true }}
@@ -183,10 +182,6 @@ jobs:
           gradle-version: wrapper
           gradle-home-cache-cleanup: true
           dependency-graph: generate-and-submit
-          gradle-home-cache-includes: |
-            caches
-            notifications
-            jdks
           gradle-home-cache-excludes: |
             caches/build-cache-1
             caches/keyrings
