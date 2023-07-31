@@ -22,10 +22,12 @@ jobs:
     name: "Build (${{ matrix.label }})"
 
     permissions:
-      contents: "read"
+      actions: "read"
+      contents: "write"
       id-token: "write"
       checks: "write"
-      pull-requests: write
+      packages: "read"
+      pull-requests: "write"
 
     strategy:
       fail-fast: false
@@ -91,7 +93,13 @@ jobs:
       security-events: write
 
   publish-sandbox:
-    permissions: write-all
+    permissions:
+      actions: "read"
+      contents: "write"
+      id-token: "write"
+      checks: "write"
+      pull-requests: "write"
+      packages: "write"
     name: "Publish: Sandbox"
     needs: ["build", "codeql", "qodana"]
     uses: ./.github/workflows/step.publish.yml

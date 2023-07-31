@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: "Deploy"
 
 on:
   workflow_dispatch:
@@ -114,6 +114,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      packages: write
 
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}

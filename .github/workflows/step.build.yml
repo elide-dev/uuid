@@ -93,7 +93,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta' }}
           gradle-version: wrapper
           gradle-home-cache-cleanup: true
-          dependency-graph: generate
+          dependency-graph: generate-and-submit
           gradle-home-cache-includes: |
             caches
             notifications

@@ -1,5 +1,7 @@
-name: deploy
-on: workflow_dispatch
+name: Publish
+on:
+  workflow_dispatch: {}
+  workflow_call: {}
 
 jobs:
   build:
@@ -56,7 +58,6 @@ jobs:
           SIGNING_KEYID: ${{ secrets.SIGNING_KEYID }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-
 
 env:
   GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
