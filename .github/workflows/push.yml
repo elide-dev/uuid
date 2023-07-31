@@ -75,7 +75,7 @@ jobs:
       experimental: ${{ matrix.experimental }}
       java: ${{ matrix.java }}
       coverage: true
-      provenance: ${{ matrix.provenance }}
+      provenance: ${{ fromJson(matrix.provenance) }}
 
   codeql:
     name: "Analysis: CodeQL"
