@@ -361,14 +361,14 @@ checkTask.configure {
 
 // Generate PROJECT_DIR_ROOT for referencing local mocks in tests
 
-val projectDirGenRoot = layout.buildDirectory.dir("generated/projectdir/kotlin")
+val projectDirGenRoot: Provider<Directory> = layout.buildDirectory.dir("generated/projectdir/kotlin")
 val projectDirPath: String = projectDir.absolutePath
 val generateProjectDirectoryVal: TaskProvider<Task> by tasks.registering {
     group = "build"
     description = "Generate project directory build-time values"
 
     mkdir(projectDirGenRoot)
-    val projDirFile = File("$projectDirGenRoot/projdir.kt")
+    val projDirFile = File("${projectDirGenRoot.get()}/projdir.kt")
     projDirFile.writeText("")
     projDirFile.appendText(
         """

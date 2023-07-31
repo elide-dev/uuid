@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.22] - 2023-07-29
+### Changed
+- Upgrade to Kotlin 1.9.0
+- Rebase on master
+- Full support for WASM
+- SLSA, SBOM, Sigstore, etc
+
 ## [0.8.20-beta1] - 2023-04-28
 ### Changed
 - Codebase refactor and cleanup (fork)
