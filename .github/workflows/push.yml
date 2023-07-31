@@ -55,7 +55,7 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             provenance: false
-          - runner: ubuntu-latest-4-cores
+          - runner: ubuntu-latest
             flags: "--no-configuration-cache -PsonarScan=true"
             os: "linux"
             label: "Linux"
