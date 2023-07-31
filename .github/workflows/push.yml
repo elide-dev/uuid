@@ -74,7 +74,7 @@ jobs:
       flags: ${{ matrix.flags }}
       experimental: ${{ matrix.experimental }}
       java: ${{ matrix.java }}
-      coverage: ${{ matrix.coverage }}
+      coverage: true
       provenance: ${{ matrix.provenance }}
 
   codeql:

@@ -59,7 +59,7 @@ jobs:
     name: "Compile and Test"
 
     permissions:
-      contents: "read"
+      contents: "write"
       id-token: "write"
       checks: "write"
       pull-requests: "write"
