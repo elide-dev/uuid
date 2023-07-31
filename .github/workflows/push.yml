@@ -20,6 +20,9 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   TEST_EXCEPTIONS: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: "Build (${{ matrix.label }})"
