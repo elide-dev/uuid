@@ -45,7 +45,7 @@ jobs:
             coverage: true
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
-            provenance: true
+            provenance: false
           - runner: windows-latest-8-cores
             flags: "--no-configuration-cache"
             os: "windows"
