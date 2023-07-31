@@ -1,7 +1,7 @@
 # A Kotlin Multiplatform UUID
 
 [![Maven Central](https://img.shields.io/maven-central/v/dev.elide/elide-uuid.svg?label=Maven%20Central)](https://search.maven.org/artifact/dev.elide/elide-uuid)
-[![CI](https://github.com/elide-dev/uuid/actions/workflows/pr.yml/badge.svg)](https://github.com/elide-dev/uuid/actions/workflows/pr.yml)
+[![CI](https://github.com/elide-dev/uuid/actions/workflows/push.yml/badge.svg)](https://github.com/elide-dev/uuid/actions/workflows/push.yml)
 [![Elide](https://elide.dev/shield)](https://elide.dev)
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Kotlin](https://img.shields.io/badge/kotlin-WASM-yellow.svg?logo=kotlin&logoColor=yellow)](http://kotlinlang.org)

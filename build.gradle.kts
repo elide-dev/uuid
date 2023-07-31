@@ -656,7 +656,6 @@ val publishMac: TaskProvider<Task> by tasks.registering {
         "publishMacosX64PublicationToMavenRepository",
         "publishJvmPublicationToMavenRepository",
         "publishJsPublicationToMavenRepository",
-        "publishWasmPublicationToMavenRepository",
         "publishKotlinMultiplatformPublicationToMavenRepository",
         "publishWasmPublicationToMavenRepository",
     )
