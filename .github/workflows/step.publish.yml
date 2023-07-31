@@ -106,6 +106,9 @@ on:
       SIGNING_KEY:
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Publish
@@ -147,10 +150,15 @@ jobs:
             target: publishLinux
 
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@cba0d00b1fc9a034e1e642ea0f1103c282990604 # v2.5.0
+        with:
+          egress-policy: audit
+
       - name: "Setup: Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: "Setup: Cache"
-        uses: buildjet/cache@v3
+        uses: buildjet/cache@e376f15c6ec6dc595375c78633174c7e5f92dc0e # v3
         with:
           key: ${{ runner.os }}-gradle-v2-${{ hashFiles('gradle/libs.versions.toml', '*.lockfile') }}
           restore-keys: |
@@ -161,21 +169,21 @@ jobs:
       - id: 'auth'
         name: "Setup: GCS"
         if: ${{ inputs.gcs == true }}
-        uses: "google-github-actions/auth@v1"
+        uses: "google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033 # v1.1.1"
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
       - name: 'Set up Cloud SDK'
         if: ${{ inputs.gcs == true }}
-        uses: 'google-github-actions/setup-gcloud@v1'
+        uses: 'google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b # v1.1.1'
         with:
           version: '${{ vars.GCLOUD_VERSION }}'
       - name: "Setup: Zulu 20"
-        uses: buildjet/setup-java@v3
+        uses: buildjet/setup-java@3b5edd4799eb848d92664003cb1e6f74db868f19 # v3
         with:
           distribution: 'zulu'
           java-version: '20'
       - name: "Publish (${{ matrix.label }})"
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c # v2.7.0
         id: publish
         with:
           cache-read-only: true
@@ -202,7 +210,7 @@ jobs:
         run: |
           echo "hashes=$(sha256sum ./build/libs/* | base64 -w0)" >> "$GITHUB_OUTPUT"
       - name: "Artifacts: Libraries"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         if: failure() || success()
         with:
           name: libraries
@@ -210,7 +218,7 @@ jobs:
             build/libs/
             build/spdx/
       - name: "Artifacts: Reports"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         if: failure() || success()
         with:
           name: reports
