@@ -134,8 +134,8 @@ kotlin {
             withJava()
             withSourcesJar(publish = true)
             jvmToolchain {
-                languageVersion.set(JavaLanguageVersion.of(20))
-                vendor.set(JvmVendorSpec.AZUL)
+                languageVersion = JavaLanguageVersion.of(20)
+                vendor = JvmVendorSpec.AZUL
             }
 
             compilations.all {
@@ -321,7 +321,7 @@ rootProject.plugins.withType(YarnPlugin::class.java) {
 
 val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaHtml)
-    archiveClassifier.set("javadoc")
+    archiveClassifier = "javadoc"
     from(tasks.dokkaHtml.get().outputDirectory)
 }
 
@@ -341,7 +341,7 @@ val ktlint by tasks.registering(JavaExec::class) {
     group = "verification"
     description = "Check Kotlin code style."
     classpath = ktlintConfig
-    mainClass.set("com.pinterest.ktlint.Main")
+    mainClass = "com.pinterest.ktlint.Main"
     args = listOf("src/**/*.kt")
 }
 
@@ -349,7 +349,7 @@ val ktlintformat by tasks.registering(JavaExec::class) {
     group = "formatting"
     description = "Fix Kotlin code style deviations."
     classpath = ktlintConfig
-    mainClass.set("com.pinterest.ktlint.Main")
+    mainClass = "com.pinterest.ktlint.Main"
     args = listOf("-F", "src/**/*.kt", "*.kts")
 }
 
@@ -450,10 +450,8 @@ tasks.withType<JavaCompile>().configureEach {
 
 plugins.withType(io.gitlab.arturbosch.detekt.DetektPlugin::class) {
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class) detekt@{
-        reports.sarif.required.set(true)
-        reports.sarif.outputLocation.set(
-            rootProject.buildDir.resolve("reports/detekt/report.sarif")
-        )
+        reports.sarif.required = true
+        reports.sarif.outputLocation = rootProject.buildDir.resolve("reports/detekt/report.sarif")
     }
 }
 
@@ -492,17 +490,17 @@ val relock: TaskProvider<Task> by tasks.registering {
 spdxSbom {
     targets {
         create("release") {
-            configurations.set(listOf("jvmRuntimeClasspath"))
+            configurations = listOf("jvmRuntimeClasspath")
 
             scm {
-                uri.set("https://github.com/elide-dev/uuid")
+                uri = "https://github.com/elide-dev/uuid"
             }
-            // configure here
+
             document {
-                name.set("Elide Multiplatform UUID")
-                namespace.set("https://elide.dev/spdx/F9B2EC53-49B0-41C7-A013-55FC4BA6B677")
-                creator.set("Person:Sam Gammon")
-                packageSupplier.set("Organization:Elide")
+                name = "Elide Multiplatform UUID"
+                namespace = "https://elide.dev/spdx/F9B2EC53-49B0-41C7-A013-55FC4BA6B677"
+                creator = "Person:Sam Gammon"
+                packageSupplier = "Organization:Elide"
             }
         }
     }
@@ -545,25 +543,25 @@ publishing {
         artifactId = artifactId.replace("uuid", "elide-uuid")
 
         pom {
-            name.set("Elide UUID")
-            url.set("https://elide.dev")
-            description.set("UUID tools for Kotlin Multiplatform.")
+            name = "Elide UUID"
+            url = "https://elide.dev"
+            description = "UUID tools for Kotlin Multiplatform."
 
             licenses {
                 license {
-                    name.set("MIT License")
-                    url.set("https://github.com/elide-dev/elide/blob/v3/LICENSE")
+                    name = "MIT License"
+                    url = "https://github.com/elide-dev/elide/blob/v3/LICENSE"
                 }
             }
             developers {
                 developer {
-                    id.set("sgammon")
-                    name.set("Sam Gammon")
-                    email.set("samuel.gammon@gmail.com")
+                    id = "sgammon"
+                    name = "Sam Gammon"
+                    email = "samuel.gammon@gmail.com"
                 }
             }
             scm {
-                url.set("https://github.com/elide-dev/elide")
+                url = "https://github.com/elide-dev/elide"
             }
         }
     }
@@ -571,9 +569,9 @@ publishing {
 
 nexusPublishing {
     repositories {
-        sonatype {  //only for users registered in Sonatype after 24 Feb 2021
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         }
     }
 }
