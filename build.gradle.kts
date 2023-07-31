@@ -361,7 +361,7 @@ checkTask.configure {
 
 // Generate PROJECT_DIR_ROOT for referencing local mocks in tests
 
-val projectDirGenRoot = "$buildDir/generated/projectdir/kotlin"
+val projectDirGenRoot = "${layout.buildDirectory}/generated/projectdir/kotlin"
 val projectDirPath: String = projectDir.absolutePath
 val generateProjectDirectoryVal: TaskProvider<Task> by tasks.registering {
     group = "build"
@@ -451,7 +451,7 @@ tasks.withType<JavaCompile>().configureEach {
 plugins.withType(io.gitlab.arturbosch.detekt.DetektPlugin::class) {
     tasks.withType(io.gitlab.arturbosch.detekt.Detekt::class) detekt@{
         reports.sarif.required = true
-        reports.sarif.outputLocation = rootProject.buildDir.resolve("reports/detekt/report.sarif")
+        reports.sarif.outputLocation = rootProject.layout.buildDirectory.asFile.get().resolve("reports/detekt/report.sarif")
     }
 }
 
