@@ -46,7 +46,7 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             provenance: false
-          - runner: windows-latest-8-cores
+          - runner: windows-latest
             flags: "--no-configuration-cache"
             os: "windows"
             label: "Windows"
@@ -76,7 +76,7 @@ jobs:
       java: ${{ matrix.java }}
       coverage: true
       push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      provenance: ${{ fromJson(matrix.provenance) }}
+      provenance: ${{ matrix.provenance }}
 
   codeql:
     name: "Analysis: CodeQL"
