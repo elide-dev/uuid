@@ -119,7 +119,7 @@ kotlin {
     explicitApi()
 
     targets {
-        js(IR) {
+        js {
             compilations.all {
                 kotlinOptions {
                     sourceMap = true
@@ -129,6 +129,7 @@ kotlin {
             }
             browser()
             nodejs()
+            generateTypeScriptDefinitions()
         }
         jvm {
             withJava()
