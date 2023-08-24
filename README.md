@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/dev.elide/elide-uuid.svg?label=Maven%20Central)](https://search.maven.org/artifact/dev.elide/elide-uuid)
 [![CI](https://github.com/elide-dev/uuid/actions/workflows/push.yml/badge.svg)](https://github.com/elide-dev/uuid/actions/workflows/push.yml)
 [![Elide](https://elide.dev/shield)](https://elide.dev)
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Kotlin](https://img.shields.io/badge/kotlin-WASM-yellow.svg?logo=kotlin&logoColor=yellow)](http://kotlinlang.org)
 [![Kotlin/JS. IR supported](https://img.shields.io/badge/kotlin-IR-yellow?logo=kotlin&logoColor=yellow)](https://kotl.in/jsirsupported)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4-ff69b4.svg)](CODE_OF_CONDUCT.md)
