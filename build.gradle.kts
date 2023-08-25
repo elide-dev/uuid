@@ -605,6 +605,10 @@ tasks.check {
     )
 }
 
+val signAll by tasks.registering {
+    dependsOn(tasks.withType(Sign::class))
+}
+
 val preMerge: TaskProvider<Task> by tasks.registering {
     group = "test"
     description = "Run all tests and checks"
@@ -671,4 +675,14 @@ val publishLinux: TaskProvider<Task> by tasks.registering {
         "publishLinuxX64PublicationToMavenRepository",
         "publishLinuxArm64PublicationToMavenRepository",
     )
+}
+
+val signingTasks = tasks.withType(Sign::class)
+
+tasks.names.forEach {
+    if (it.startsWith("linkDebug") || (it.startsWith("compileTest"))) {
+        tasks.named(it).configure {
+            dependsOn(signingTasks)
+        }
+    }
 }
