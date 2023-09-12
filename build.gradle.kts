@@ -177,6 +177,13 @@ kotlin {
         linuxX64()
         linuxArm64()
     }
+    if (HostManager.hostIsMingw) {
+        afterEvaluate {
+            tasks.named("wasmJsBrowserTest") {
+                enabled = false
+            }
+        }
+    }
 
     sourceSets {
         val commonMain by getting
