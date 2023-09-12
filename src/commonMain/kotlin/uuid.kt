@@ -18,7 +18,6 @@ package dev.elide.uuid
 
 import kotlin.experimental.and
 import kotlin.experimental.or
-import kotlin.native.concurrent.SharedImmutable
 
 // Number of bytes in a UUID
 internal const val UUID_BYTES = 16
@@ -27,7 +26,6 @@ internal const val UUID_BYTES = 16
 internal const val UUID_STRING_LENGTH = 36
 
 // Ranges of non-hyphen characters in a UUID string
-@SharedImmutable
 internal val UUID_CHAR_RANGES: List<IntRange> = listOf(
     0 until 8,
     9 until 13,
@@ -37,11 +35,9 @@ internal val UUID_CHAR_RANGES: List<IntRange> = listOf(
 )
 
 // Indices of the hyphen characters in a UUID string
-@SharedImmutable
 internal val UUID_HYPHEN_INDICES = listOf(8, 13, 18, 23)
 
 // UUID chars arranged from smallest to largest, so they can be indexed by their byte representations
-@SharedImmutable
 internal val UUID_CHARS = ('0'..'9') + ('a'..'f')
 
 /**

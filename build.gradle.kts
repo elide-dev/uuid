@@ -34,9 +34,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
-    kotlin("multiplatform") version "1.9.10"
+    kotlin("multiplatform") version "1.9.20-Beta"
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
+    alias(libs.plugins.versionCatalogUpdate)
+    alias(libs.plugins.buildTimeTracker)
     alias(libs.plugins.doctor)
     alias(libs.plugins.dokka)
     alias(libs.plugins.sonar)
@@ -73,6 +75,7 @@ version = VERSION
 val kotlinCompilerArgs = listOf(
     "-progressive",
     "-Xcontext-receivers",
+    "-Xexpect-actual-classes",
 )
 
 val jvmFlags = kotlinCompilerArgs.plus(listOf(
@@ -118,60 +121,61 @@ tasks.dokkaHtml {
 kotlin {
     explicitApi()
 
-    targets {
-        js {
-            compilations.all {
-                kotlinOptions {
-                    sourceMap = true
-                    moduleKind = "umd"
-                    metaInfo = true
-                }
+    js(IR) {
+        compilations.all {
+            kotlinOptions {
+                sourceMap = true
+                moduleKind = "umd"
+                metaInfo = true
             }
-            browser()
-            nodejs()
-            generateTypeScriptDefinitions()
         }
-        jvm {
-            withJava()
-            withSourcesJar(publish = true)
-            jvmToolchain {
-                languageVersion = JavaLanguageVersion.of(20)
-                vendor = JvmVendorSpec.AZUL
-            }
+        browser()
+        nodejs()
+        generateTypeScriptDefinitions()
+    }
+    jvm {
+        withJava()
+        withSourcesJar(publish = true)
+        jvmToolchain {
+            languageVersion = JavaLanguageVersion.of(20)
+            vendor = JvmVendorSpec.AZUL
+        }
 
-            compilations.all {
-                kotlinOptions {
-                    jvmTarget = jvmTargetMinimum
-                }
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = jvmTargetMinimum
             }
         }
-        wasm {
-            d8()
+    }
+    wasmJs {
+        d8()
+        nodejs()
+        browser()
+    }
+
+    if (HostManager.hostIsMac) {
+        macosX64()
+        macosArm64()
+        iosX64()
+        iosArm64()
+        iosSimulatorArm64()
+        watchosArm32()
+        watchosArm64()
+        watchosX64()
+        watchosSimulatorArm64()
+        watchosDeviceArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+    }
+    if (HostManager.hostIsMingw || HostManager.hostIsMac) {
+        mingwX64 {
+            binaries.findTest(DEBUG)!!.linkerOpts = mutableListOf("-Wl,--subsystem,windows")
         }
-        if (HostManager.hostIsMac) {
-            macosX64()
-            macosArm64()
-            iosX64()
-            iosArm64()
-            iosSimulatorArm64()
-            watchosArm32()
-            watchosArm64()
-            watchosX64()
-            watchosSimulatorArm64()
-            watchosDeviceArm64()
-            tvosArm64()
-            tvosX64()
-            tvosSimulatorArm64()
-        }
-        if (HostManager.hostIsMingw || HostManager.hostIsMac) {
-            mingwX64 {
-                binaries.findTest(DEBUG)!!.linkerOpts = mutableListOf("-Wl,--subsystem,windows")
-            }
-        }
-        if (HostManager.hostIsLinux || HostManager.hostIsMac) {
-            linuxX64()
-            linuxArm64()
-        }
+    }
+    if (HostManager.hostIsLinux || HostManager.hostIsMac) {
+        linuxX64()
+        linuxArm64()
     }
 
     sourceSets {
@@ -185,7 +189,7 @@ kotlin {
         val nonJvmMain by creating { dependsOn(commonMain) }
         val nonJvmTest by creating { dependsOn(commonTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
-        val wasmMain by getting { dependsOn(nonJvmMain) }
+        val wasmJsMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
         val nativeMain by creating { dependsOn(nonJvmMain) }
         val nativeTest by creating { dependsOn(nonJvmTest) }
@@ -271,19 +275,18 @@ kotlin {
                 apiVersion = kotlinLanguage
                 languageVersion = kotlinLanguage
                 allWarningsAsErrors = HostManager.hostIsMac
+                freeCompilerArgs = freeCompilerArgs.plus(kotlinCompilerArgs).toSortedSet().toList()
+
                 when (this) {
                     is KotlinJvmOptions -> {
                         jvmTarget = jvmTargetMinimum
                         javaParameters = true
-                        freeCompilerArgs = jvmFlags
+                        freeCompilerArgs = freeCompilerArgs.plus(jvmFlags).toSortedSet().toList()
                     }
                     is KotlinJsOptions -> {
                         sourceMap = true
                         moduleKind = "umd"
                         metaInfo = true
-                    }
-                    else -> {
-                        freeCompilerArgs = kotlinCompilerArgs
                     }
                 }
             }
@@ -293,7 +296,9 @@ kotlin {
 }
 
 tasks.withType<KotlinNativeCompile>().configureEach {
-    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
+    compilerOptions.freeCompilerArgs.addAll(listOf(
+        "-opt-in=kotlinx.cinterop.ExperimentalForeignApi",
+    ).plus(kotlinCompilerArgs))
 }
 
 tasks.withType<Test>().configureEach {
@@ -335,7 +340,7 @@ dependencies {
 detekt {
     parallel = true
     ignoreFailures = true
-    config = rootProject.files(".github/detekt.yml")
+    config.setFrom(rootProject.files(".github/detekt.yml"))
 }
 
 val ktlint by tasks.registering(JavaExec::class) {
@@ -536,6 +541,10 @@ publishing {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
+        }
+        maven {
+            name = "ElideDev"
+            url = uri(project.properties["RELEASE_REPOSITORY_URL"] as String)
         }
     }
 
