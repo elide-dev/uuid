@@ -22,6 +22,7 @@
 )
 
 import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
+import dev.sigstore.sign.tasks.SigstoreSignFilesTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
@@ -121,7 +122,11 @@ tasks.dokkaHtml {
 kotlin {
     explicitApi()
 
-    js(IR) {
+    js {
+        browser()
+        nodejs()
+        generateTypeScriptDefinitions()
+
         compilations.all {
             kotlinOptions {
                 sourceMap = true
@@ -129,9 +134,6 @@ kotlin {
                 metaInfo = true
             }
         }
-        browser()
-        nodejs()
-        generateTypeScriptDefinitions()
     }
     jvm {
         withJava()
@@ -151,6 +153,9 @@ kotlin {
         d8()
         nodejs()
         browser()
+    }
+    wasmWasi {
+        // nothing at this time
     }
 
     if (HostManager.hostIsMac) {
@@ -197,6 +202,7 @@ kotlin {
         val nonJvmTest by creating { dependsOn(commonTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
         val wasmJsMain by getting { dependsOn(nonJvmMain) }
+        val wasmWasiMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
         val nativeMain by creating { dependsOn(nonJvmMain) }
         val nativeTest by creating { dependsOn(nonJvmTest) }
@@ -537,6 +543,10 @@ val mavenPassword: String? = properties["mavenPassword"] as? String
 
 tasks.withType(Sign::class) {
     onlyIf { isReleaseBuild && (System.getenv("SIGNING_KEYID") != null) }
+}
+
+tasks.withType(SigstoreSignFilesTask::class) {
+    onlyIf { isReleaseBuild }
 }
 
 publishing {
