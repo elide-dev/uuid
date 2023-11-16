@@ -73,7 +73,6 @@ group = GROUP
 version = VERSION
 
 val kotlinCompilerArgs = listOf(
-    "-progressive",
     "-Xcontext-receivers",
     "-Xexpect-actual-classes",
 )
