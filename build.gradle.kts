@@ -271,7 +271,7 @@ kotlin {
         languageSettings.apply {
             apiVersion = kotlinLanguage
             languageVersion = kotlinLanguage
-            progressiveMode = true
+            progressiveMode = false
             optIn("kotlin.ExperimentalUnsignedTypes")
         }
     }
