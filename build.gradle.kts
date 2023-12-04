@@ -38,8 +38,6 @@ plugins {
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.versionCatalogUpdate)
-    alias(libs.plugins.buildTimeTracker)
-    alias(libs.plugins.doctor)
     alias(libs.plugins.dokka)
     alias(libs.plugins.sonar)
     alias(libs.plugins.kover)
