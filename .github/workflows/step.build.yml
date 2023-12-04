@@ -19,7 +19,7 @@ on:
       java:
         required: false
         type: string
-        default: 20
+        default: '21'
       coverage:
         required: false
         type: boolean
@@ -83,6 +83,7 @@ jobs:
         uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
       - name: "Setup: Buildless"
         uses: buildless/setup@v1.0.1
+        if: inputs.os != 'macos'
         with:
           agent: true
           apikey: ${{ secrets.BUILDLESS_APIKEY }}

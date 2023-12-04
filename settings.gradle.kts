@@ -15,8 +15,6 @@
   "UnstableApiUsage",
 )
 
-import build.less.plugin.settings.buildless
-
 pluginManagement {
   repositories {
     maven("https://gradle.pkg.st/")
@@ -44,10 +42,6 @@ gradleEnterprise {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
     termsOfServiceAgree = "yes"
   }
-}
-
-buildless {
-  // No configuration needed
 }
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
