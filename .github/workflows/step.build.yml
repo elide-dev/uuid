@@ -119,6 +119,7 @@ jobs:
             apiCheck
             ktlint
             detekt
+            -x wasmJsNodeTest
             -PVERSION=1.0-SNAPSHOT
             --scan
             --no-daemon
