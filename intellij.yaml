@@ -1,0 +1,7 @@
+sharedIndex:
+  project:
+    - url: https://jetbrains.less.build
+  consents:
+    - kind: project
+      decision: allowed
+
