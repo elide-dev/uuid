@@ -19,7 +19,7 @@ on:
       java:
         required: false
         type: string
-        default: 20
+        default: 21
       coverage:
         required: false
         type: boolean
@@ -91,11 +91,11 @@ jobs:
           path: |
             ~/.sonar/cache
             ~/.konan
-      - name: "Setup: Zulu 20"
+      - name: "Setup: Zulu 21"
         uses: buildjet/setup-java@3b5edd4799eb848d92664003cb1e6f74db868f19 # v3
         with:
           distribution: 'zulu'
-          java-version: '20'
+          java-version: '21'
       - name: "Build and Test"
         uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
         id: gradlebuild
