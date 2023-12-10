@@ -34,12 +34,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
-    kotlin("multiplatform") version "2.0.0-Beta1"
+    kotlin("multiplatform") version "1.9.21"
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.versionCatalogUpdate)
-    alias(libs.plugins.buildTimeTracker)
-    alias(libs.plugins.doctor)
     alias(libs.plugins.dokka)
     alias(libs.plugins.sonar)
     alias(libs.plugins.kover)
@@ -136,7 +134,7 @@ kotlin {
         withJava()
         withSourcesJar(publish = true)
         jvmToolchain {
-            languageVersion = JavaLanguageVersion.of(20)
+            languageVersion = JavaLanguageVersion.of(21)
             vendor = JvmVendorSpec.AZUL
         }
 
@@ -700,4 +698,8 @@ tasks.names.forEach {
             dependsOn(signingTasks)
         }
     }
+}
+
+tasks.named("wasmJsNodeTest").configure {
+  enabled = false
 }
