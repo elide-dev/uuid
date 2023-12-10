@@ -183,7 +183,7 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: "Publish (${{ matrix.label }})"
-        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
+        uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6 # v2.10.0
         id: publish
         with:
           cache-read-only: true
