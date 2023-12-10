@@ -174,7 +174,7 @@ kotlin {
         linuxX64()
         linuxArm64()
     }
-    if (HostManager.hostIsMingw) {
+    if (HostManager.hostIsMingw || HostManager.hostIsMac) {
         afterEvaluate {
             tasks.named("wasmJsBrowserTest") {
                 enabled = false
@@ -703,3 +703,4 @@ tasks.names.forEach {
 tasks.named("wasmJsNodeTest").configure {
   enabled = false
 }
+
