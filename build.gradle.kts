@@ -146,7 +146,6 @@ kotlin {
         }
     }
     wasmJs {
-        d8()
         nodejs()
         browser()
     }
