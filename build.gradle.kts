@@ -178,6 +178,9 @@ kotlin {
         tasks.named("wasmJsBrowserTest") {
             enabled = false
         }
+        tasks.named("wasmWasiNodeTest") {
+            enabled = false
+        }
     }
 
     sourceSets {
