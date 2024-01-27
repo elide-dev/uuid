@@ -10,6 +10,8 @@
          <trust file="kotlin-.*-prebuilt-.*[.]tar[.]gz" regex="true"/>
          <trust file="node-.*[.]tar[.]gz" regex="true"/>
          <trust file=".*dependency-graph.*" regex="true"/>
+         <trust file=".*dependency-analysis.*" regex="true"/>
+         <trust file=".*detekt.*" regex="true"/>
       </trusted-artifacts>
       <ignored-keys>
          <ignored-key id="4BE41A4907BCD034" reason="Key couldn't be downloaded from any key server"/>
