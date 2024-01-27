@@ -115,6 +115,12 @@ tasks.dokkaHtml {
     }
 }
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
 kotlin {
     explicitApi()
 
@@ -133,10 +139,6 @@ kotlin {
     jvm {
         withJava()
         withSourcesJar(publish = true)
-        jvmToolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-            vendor = JvmVendorSpec.AZUL
-        }
 
         compilations.all {
             kotlinOptions {
