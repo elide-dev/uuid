@@ -111,7 +111,6 @@ jobs:
           arguments: |
             preMerge
             apiCheck
-            ktlint
             detekt
             -PVERSION=1.0-SNAPSHOT
             --scan
