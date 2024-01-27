@@ -323,39 +323,13 @@ val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     from(tasks.dokkaHtml.get().outputDirectory)
 }
 
-val ktlintConfig: Configuration by configurations.creating
-
-dependencies {
-    ktlintConfig(libs.ktlint)
-}
-
 detekt {
     parallel = true
     ignoreFailures = true
     config.setFrom(rootProject.files(".github/detekt.yml"))
 }
 
-val ktlint by tasks.registering(JavaExec::class) {
-    group = "verification"
-    description = "Check Kotlin code style."
-    classpath = ktlintConfig
-    mainClass = "com.pinterest.ktlint.Main"
-    args = listOf("src/**/*.kt")
-}
-
-val ktlintformat by tasks.registering(JavaExec::class) {
-    group = "formatting"
-    description = "Fix Kotlin code style deviations."
-    classpath = ktlintConfig
-    mainClass = "com.pinterest.ktlint.Main"
-    args = listOf("-F", "src/**/*.kt", "*.kts")
-}
-
 val checkTask: TaskProvider<Task> = tasks.named("check")
-
-checkTask.configure {
-    dependsOn(ktlint)
-}
 
 // Generate PROJECT_DIR_ROOT for referencing local mocks in tests
 
@@ -604,7 +578,6 @@ val reports: TaskProvider<Task> by tasks.registering {
 
 tasks.check {
     dependsOn(
-        ktlint,
         tasks.apiCheck,
         tasks.koverVerify,
     )
