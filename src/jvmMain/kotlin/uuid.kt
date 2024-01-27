@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Elide Ventures, LLC.
+ * Copyright (c) 2023-2024 Elide Ventures, LLC.
  *
  * Licensed under the MIT license (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
@@ -14,21 +14,71 @@
 package dev.elide.uuid
 
 import java.nio.ByteBuffer
-import java.util.UUID
+import java.io.Serializable as JSerializable
+import java.util.UUID as JavaUUID
 
-// This suppression is required to force Kotlin to accept the Java getters as
-// val definitions:
-//
-// - https://youtrack.jetbrains.com/issue/KT-15620
-// - https://youtrack.jetbrains.com/issue/KT-27413
-@Suppress("NO_ACTUAL_CLASS_MEMBER_FOR_EXPECTED_CLASS")
-public actual typealias Uuid = UUID
+/**
+ * Typealias for a UUID [Long] pair.
+ */
+public typealias UuidPair = Pair<Long, Long>
+
+/**
+ * A RFC4122 UUID wrapper class.
+ *
+ * This type wraps the standard [JavaUUID] type, and behaves identically; it will produce a string via [toString] in the
+ * same manner, and is [Comparable] with other UUIDs, and [java.io.Serializable].
+ */
+public actual class Uuid private constructor (private val pair: UuidPair):
+  Comparable<Uuid>,
+  JSerializable {
+  public companion object {
+    @Suppress("ConstPropertyName")
+    public const val serialVersionUID: Long = 1L
+
+    @JvmStatic public fun of(most: Long, least: Long): Uuid = Uuid(most to least)
+
+    @JvmStatic public fun from(javaUuid: JavaUUID): Uuid = Uuid(
+      javaUuid.mostSignificantBits to javaUuid.leastSignificantBits
+    )
+
+    @JvmStatic public fun randomUUID(): Uuid = from(JavaUUID.randomUUID())
+  }
+
+  public val javaUuid: JavaUUID by lazy {
+    JavaUUID(mostSignificantBits, leastSignificantBits)
+  }
+
+  public actual constructor(msb: Long, lsb: Long): this(msb to lsb)
+
+  actual override fun compareTo(other: Uuid): Int =
+    javaUuid.compareTo(other.javaUuid)
+
+  public actual val mostSignificantBits: Long
+    get() = pair.first
+
+  public actual val leastSignificantBits: Long
+    get() = pair.second
+
+  override fun toString(): String = javaUuid.toString()
+}
+
+public actual inline val Uuid.version: Int
+  get() = javaUuid.version()
+
+public actual inline val Uuid.variant: Int
+  get() = javaUuid.variant()
+
+public actual val Uuid.bytes: ByteArray
+    get() = ByteBuffer.allocate(16).putLong(mostSignificantBits).putLong(leastSignificantBits).array()
+
+@Suppress("NOTHING_TO_INLINE")
+public actual inline fun uuid4(): Uuid = Uuid.randomUUID()
 
 public actual fun uuidOf(bytes: ByteArray): Uuid {
-    require(bytes.size == UUID_BYTES) {
-        "Invalid UUID bytes. Expected $UUID_BYTES bytes; found ${bytes.size}"
-    }
-    return ByteBuffer.wrap(bytes).let { UUID(it.long, it.long) }
+  require(bytes.size == UUID_BYTES) {
+    "Invalid UUID bytes. Expected $UUID_BYTES bytes; found ${bytes.size}"
+  }
+  return ByteBuffer.wrap(bytes).let { Uuid.of(it.long, it.long) }
 }
 
 // Implementation Notes:
@@ -62,61 +112,47 @@ public actual fun uuidOf(bytes: ByteArray): Uuid {
 //   MSB/LSB approach. The reason for that has probably to do with how the JVM
 //   works and that such arrays always lead to heap allocations.
 public actual fun uuidFrom(string: String): Uuid =
-    if (string.length == 36) {
-        Uuid(string.segmentToLong(0, 19), string.segmentToLong(19, 36))
-    } else {
-        throw IllegalArgumentException(
-            "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string",
-        )
-    }
+  if (string.length == 36) {
+    Uuid.of(string.segmentToLong(0, 19), string.segmentToLong(19, 36))
+  } else {
+    throw IllegalArgumentException(
+      "Invalid UUID string, expected exactly 36 characters but got ${string.length}: $string",
+    )
+  }
 
 private fun String.segmentToLong(start: Int, end: Int): Long {
-    var result = 0L
+  var result = 0L
+  var i = start
+  do {
+    if (this[i] == '-') {
+      require(i == 8 || i == 13 || i == 18 || i == 23) {
+        "Invalid UUID string, encountered dash at index $i but it can occur only at 8, 13, 18, or 23: $this"
+      }
+    } else {
+      result *= 16
+      when (this[i]) {
+        '0' -> Unit
+        '1' -> result += 1L
+        '2' -> result += 2L
+        '3' -> result += 3L
+        '4' -> result += 4L
+        '5' -> result += 5L
+        '6' -> result += 6L
+        '7' -> result += 7L
+        '8' -> result += 8L
+        '9' -> result += 9L
+        'a', 'A' -> result += 10L
+        'b', 'B' -> result += 11L
+        'c', 'C' -> result += 12L
+        'd', 'D' -> result += 13L
+        'e', 'E' -> result += 14L
+        'f', 'F' -> result += 15L
+        else -> throw IllegalArgumentException(
+          "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this",
+        )
+      }
+    }
+  } while (++i < end)
 
-    var i = start
-    do {
-        if (this[i] == '-') {
-            require(i == 8 || i == 13 || i == 18 || i == 23) {
-                "Invalid UUID string, encountered dash at index $i but it can occur only at 8, 13, 18, or 23: $this"
-            }
-        } else {
-            result *= 16
-            when (this[i]) {
-                '0' -> Unit
-                '1' -> result += 1L
-                '2' -> result += 2L
-                '3' -> result += 3L
-                '4' -> result += 4L
-                '5' -> result += 5L
-                '6' -> result += 6L
-                '7' -> result += 7L
-                '8' -> result += 8L
-                '9' -> result += 9L
-                'a', 'A' -> result += 10L
-                'b', 'B' -> result += 11L
-                'c', 'C' -> result += 12L
-                'd', 'D' -> result += 13L
-                'e', 'E' -> result += 14L
-                'f', 'F' -> result += 15L
-                else -> throw IllegalArgumentException(
-                    "Invalid UUID string, encountered non-hexadecimal digit `${this[i]}` at index $i in: $this",
-                )
-            }
-        }
-    } while (++i < end)
-
-    return result
+  return result
 }
-
-@Suppress("NOTHING_TO_INLINE")
-public actual inline fun uuid4(): Uuid =
-    UUID.randomUUID()
-
-public actual val UUID.bytes: ByteArray
-    get() = ByteBuffer.allocate(16).putLong(mostSignificantBits).putLong(leastSignificantBits).array()
-
-public actual inline val UUID.version: Int
-    get() = version()
-
-public actual inline val UUID.variant: Int
-    get() = variant()
