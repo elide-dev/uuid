@@ -56,7 +56,7 @@ jobs:
             java: ${{ vars.JVM_VERSION }}
             provenance: false
           - runner: ubuntu-latest
-            flags: "--no-configuration-cache -PsonarScan=true"
+            flags: "--no-configuration-cache"
             os: "linux"
             label: "Linux"
             experimental: false
