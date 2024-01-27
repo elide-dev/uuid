@@ -524,6 +524,10 @@ tasks.withType(Sign::class) {
     onlyIf { isReleaseBuild && (System.getenv("SIGNING_KEYID") != null) }
 }
 
+tasks.withType(SigstoreSignFilesTask::class) {
+    onlyIf { isReleaseBuild }
+}
+
 publishing {
     repositories {
         maven {
