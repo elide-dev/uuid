@@ -14,7 +14,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Felide-dev%2Fuuid.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Felide-dev%2Fuuid?ref=badge_shield)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7689/badge)](https://bestpractices.coreinfrastructure.org/projects/7689)
 
-K/N doesn't have a UUID yet. This brings a UUID that matches UUIDs on various platforms:
+K/N UUID. This brings a UUID that matches UUIDs on various platforms:
 
 - iOS/Mac: `NSUUID`
 - Java: `java.util.UUID`
@@ -26,6 +26,8 @@ K/N doesn't have a UUID yet. This brings a UUID that matches UUIDs on various pl
 - Adheres to RFC4122
 - Tested
 - Tested against macOS/iOS UUID to verify correctness
+- All Kotlin targets, including WASM/WASI
+- Serializable on JVM
 
 ### Setup
 
