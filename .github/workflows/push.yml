@@ -49,15 +49,6 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             provenance: false
-          - runner: windows-latest
-            flags: "--no-configuration-cache"
-            os: "windows"
-            label: "Windows"
-            experimental: false
-            coverage: true
-            gvm: ${{ vars.GVM_VERSION }}
-            java: ${{ vars.JVM_VERSION }}
-            provenance: false
           - runner: ubuntu-latest
             flags: "--no-configuration-cache -PsonarScan=true"
             os: "linux"
@@ -67,6 +58,15 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             provenance: true
+#          - runner: windows-latest
+#            flags: "--no-configuration-cache"
+#            os: "windows"
+#            label: "Windows"
+#            experimental: false
+#            coverage: true
+#            gvm: ${{ vars.GVM_VERSION }}
+#            java: ${{ vars.JVM_VERSION }}
+#            provenance: false
 
     uses: ./.github/workflows/step.build.yml
     secrets: inherit
