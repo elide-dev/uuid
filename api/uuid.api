@@ -14,10 +14,12 @@ public final class dev/elide/uuid/Uuid : java/io/Serializable, java/lang/Compara
 	public synthetic fun <init> (Lkotlin/Pair;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun compareTo (Ldev/elide/uuid/Uuid;)I
 	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun equals (Ljava/lang/Object;)Z
 	public static final fun from (Ljava/util/UUID;)Ldev/elide/uuid/Uuid;
 	public final fun getJavaUuid ()Ljava/util/UUID;
 	public final fun getLeastSignificantBits ()J
 	public final fun getMostSignificantBits ()J
+	public fun hashCode ()I
 	public static final fun of (JJ)Ldev/elide/uuid/Uuid;
 	public static final fun randomUUID ()Ldev/elide/uuid/Uuid;
 	public fun toString ()Ljava/lang/String;
