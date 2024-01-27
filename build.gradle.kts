@@ -22,6 +22,7 @@
 )
 
 import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
+import dev.sigstore.sign.tasks.SigstoreSignFilesTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
@@ -149,7 +150,9 @@ kotlin {
         nodejs()
         browser()
     }
-
+    wasmWasi {
+        nodejs()
+    }
     macosX64()
     macosArm64()
     iosX64()
@@ -188,6 +191,7 @@ kotlin {
         val nonJvmTest by creating { dependsOn(commonTest) }
         val jsMain by getting { dependsOn(nonJvmMain) }
         val wasmJsMain by getting { dependsOn(nonJvmMain) }
+        val wasmWasiMain by getting { dependsOn(nonJvmMain) }
         val jsTest by getting { dependsOn(nonJvmTest) }
         val nativeMain by creating { dependsOn(nonJvmMain) }
         val nativeTest by creating { dependsOn(nonJvmTest) }
