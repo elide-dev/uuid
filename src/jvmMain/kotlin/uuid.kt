@@ -60,6 +60,13 @@ public actual class Uuid private constructor (private val pair: UuidPair):
     get() = pair.second
 
   override fun toString(): String = javaUuid.toString()
+
+  override fun hashCode(): Int = javaUuid.hashCode()
+
+  override fun equals(other: Any?): Boolean = when (other) {
+    is Uuid -> javaUuid == other.javaUuid
+    else -> false
+  }
 }
 
 public actual inline val Uuid.version: Int
