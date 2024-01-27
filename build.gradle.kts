@@ -151,6 +151,7 @@ kotlin {
         browser()
     }
     wasmWasi {
+        applyBinaryen()
         nodejs()
     }
     macosX64()
