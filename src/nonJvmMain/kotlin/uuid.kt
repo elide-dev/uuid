@@ -111,7 +111,7 @@ constructor(internal val uuidBytes: ByteArray) : Comparable<Uuid> {
     /**
      * @return The result of comparing [uuidBytes] between this and [other]
      */
-    override fun compareTo(other: Uuid): Int {
+    override actual fun compareTo(other: Uuid): Int {
         for (i in (0 until UUID_BYTES)) {
             val compareResult = uuidBytes[i].compareTo(other.uuidBytes[i])
             if (compareResult != 0) return compareResult

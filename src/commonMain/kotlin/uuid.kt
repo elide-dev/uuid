@@ -60,6 +60,9 @@ public expect class Uuid : Comparable<Uuid> {
 
     /** The least significant 64 bits of this UUID's 128 bit value. */
     public val leastSignificantBits: Long
+
+    /** UUIDs implement the `Comparable` interface. */
+    public override fun compareTo(other: Uuid): Int
 }
 
 /** Gets the raw UUID bytes */
