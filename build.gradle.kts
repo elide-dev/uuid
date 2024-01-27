@@ -37,7 +37,6 @@ plugins {
     kotlin("multiplatform") version "2.0.0-Beta3"
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
-    alias(libs.plugins.versionCatalogUpdate)
     alias(libs.plugins.dokka)
     alias(libs.plugins.sonar)
     alias(libs.plugins.kover)
@@ -46,7 +45,6 @@ plugins {
     alias(libs.plugins.spdx.sbom)
     alias(libs.plugins.cyclonedx)
     alias(libs.plugins.sigstore)
-    alias(libs.plugins.dependency.analysis)
     alias(libs.plugins.kotlinx.benchmark)
     alias(libs.plugins.kotlinx.apiValidator)
 
