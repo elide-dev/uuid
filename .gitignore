@@ -9,3 +9,4 @@ out/
 local.properties
 .DS_Store
 .codebase/indexes
+.kotlin/
