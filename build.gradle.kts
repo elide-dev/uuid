@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
-    kotlin("multiplatform") version "1.9.21"
+    kotlin("multiplatform") version "1.9.22"
     alias(libs.plugins.testlogger)
     alias(libs.plugins.versionCheck)
     alias(libs.plugins.versionCatalogUpdate)
