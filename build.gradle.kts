@@ -313,6 +313,9 @@ rootProject.plugins.withType(YarnPlugin::class.java) {
     rootProject.the<YarnRootExtension>().reportNewYarnLock = false
     rootProject.the<YarnRootExtension>().yarnLockAutoReplace = true
 }
+tasks.withType(org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask::class.java).configureEach {
+  args.add("--ignore-engines")
+}
 
 val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
     dependsOn(tasks.dokkaHtml)
