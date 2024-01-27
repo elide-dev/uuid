@@ -78,7 +78,7 @@ public expect val Uuid.bytes: ByteArray
  * - **`7`** – reserved for future extension
  *
  * @return The variant number of this [Uuid].
- * @sample com.benasher44.uuid.UuidTest.variants
+ * @sample dev.elide.uuid.UuidTest.variants
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.1.1">RFC 4122: Section 4.1.1</a>
  */
 // @SinceKotlin("1.x")
@@ -99,7 +99,7 @@ public expect val Uuid.variant: Int
  * [RFC 4122](https://tools.ietf.org/html/rfc4122).
  *
  * @return The version number of this [Uuid].
- * @sample com.benasher44.uuid.UuidTest.versions
+ * @sample dev.elide.uuid.UuidTest.versions
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.1.3">RFC 4122: Section 4.1.3</a>
  */
 // @SinceKotlin("1.x")
@@ -131,7 +131,7 @@ public expect fun uuidOf(bytes: ByteArray): Uuid
  * source of the platform.
  *
  * @return New version 4 [UUID][Uuid] of random data.
- * @sample com.benasher44.uuid.UuidTest.uuid4_generation
+ * @sample dev.elide.uuid.UuidTest.uuid4_generation
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.4">RFC 4122: Section 4.4</a>
  */
 // @SinceKotlin("1.x")
@@ -178,7 +178,7 @@ public interface UuidHasher {
  * @param name withing the namespace for the "Name-Based" UUID
  * @param hasher interface that implements a hashing algorithm
  * @return New version 3 or 5 [UUID][Uuid].
- * @sample com.benasher44.uuid.uuid5Of
+ * @sample dev.elide.uuid.uuid5Of
  * @see <a href="https://tools.ietf.org/html/rfc4122#section-4.3">RFC 4122: Section 4.3</a>
  */
 public fun nameBasedUuidOf(namespace: Uuid, name: String, hasher: UuidHasher): Uuid {
