@@ -174,14 +174,6 @@ kotlin {
     mingwX64 {
         binaries.findTest(DEBUG)!!.linkerOpts = mutableListOf("-Wl,--subsystem,windows")
     }
-    afterEvaluate {
-        tasks.named("wasmJsBrowserTest") {
-            enabled = false
-        }
-        tasks.named("wasmWasiNodeTest") {
-            enabled = false
-        }
-    }
 
     sourceSets {
         val commonMain by getting
@@ -313,11 +305,9 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 rootProject.plugins.withType(NodeJsRootPlugin::class.java) {
-    // 16+ required for Apple Silicon support
-    // https://youtrack.jetbrains.com/issue/KT-49109#focus=Comments-27-5259190.0-0
     rootProject.the<NodeJsRootExtension>().download = true
     rootProject.the<NodeJsRootExtension>().version = nodeVersion
-    rootProject.the<NodeJsRootExtension>().downloadBaseUrl = "https://node.pkg.st/"
+    rootProject.the<NodeJsRootExtension>().downloadBaseUrl = "https://nodejs.org/download/v8-canary"
 }
 rootProject.plugins.withType(YarnPlugin::class.java) {
     rootProject.the<YarnRootExtension>().yarnLockMismatchReport = YarnLockMismatchReport.WARNING
@@ -699,8 +689,3 @@ tasks.names.forEach {
         }
     }
 }
-
-tasks.named("wasmJsNodeTest").configure {
-  enabled = false
-}
-
