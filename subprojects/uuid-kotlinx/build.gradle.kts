@@ -247,6 +247,11 @@ val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
   from(tasks.dokkaHtml.get().outputDirectory)
 }
 
+signing {
+  isRequired = isReleaseBuild
+  sign(publishing.publications)
+}
+
 publishing {
   repositories {
     maven {
@@ -291,4 +296,18 @@ publishing {
       }
     }
   }
+}
+
+tasks.withType(Sign::class) {
+  onlyIf { isReleaseBuild }
+}
+tasks.withType(SigstoreSignFilesTask::class) {
+  onlyIf { isReleaseBuild }
+}
+tasks.withType(AbstractPublishToMaven::class.java) {
+  val signingTasks = tasks.withType(Sign::class)
+  val sigstoreTasks = tasks.withType(SigstoreSignFilesTask::class)
+
+  dependsOn(signingTasks, sigstoreTasks)
+  mustRunAfter(signingTasks, sigstoreTasks)
 }

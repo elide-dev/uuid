@@ -80,8 +80,9 @@ val cacheDisabledTasks = listOf(
 
 val isReleaseBuild = !VERSION.contains("SNAPSHOT")
 
-repositories {
-  maven("https://maven.pkg.st/")
+signing {
+  isRequired = isReleaseBuild
+  sign(publishing.publications)
 }
 
 testlogger {
@@ -487,4 +488,18 @@ spdxSbom {
       }
     }
   }
+}
+
+tasks.withType(Sign::class) {
+  onlyIf { isReleaseBuild }
+}
+tasks.withType(SigstoreSignFilesTask::class) {
+  onlyIf { isReleaseBuild }
+}
+tasks.withType(AbstractPublishToMaven::class.java) {
+  val signingTasks = tasks.withType(Sign::class)
+  val sigstoreTasks = tasks.withType(SigstoreSignFilesTask::class)
+
+  dependsOn(signingTasks, sigstoreTasks)
+  mustRunAfter(signingTasks, sigstoreTasks)
 }
