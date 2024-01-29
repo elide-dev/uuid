@@ -65,6 +65,7 @@ jobs:
     uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@main
     secrets: inherit
     permissions:
+      actions: "read"
       contents: "write"
       id-token: "write"
       checks: "write"
