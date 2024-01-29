@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build:
-    name: "Build (${{ matrix.label }})"
+    name: "Build and Test"
 
     permissions:
       actions: "read"
