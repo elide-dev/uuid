@@ -40,7 +40,7 @@ K/N UUID. This brings a UUID that matches UUIDs on various platforms:
 
 ```kotlin
 dependencies {
-  implementation("dev.elide:uuid:<version>")
+  implementation("dev.elide:elide-uuid:<version>")
 }
 ```
 
@@ -51,6 +51,14 @@ dependencies {
 }
 ```
 
+**To enable KotlinX Serialization support:**
+
+```kotlin
+dependencies {
+  implementation("dev.elide:elide-uuid-kotlinx:<version>")
+}
+```
+
 ### Usage
 
 From any Kotlin source set:
@@ -58,6 +66,17 @@ From any Kotlin source set:
 val uuid = uuid4()
 println(uuid.toString())
 // 1b4e28ba-2fa1-11d2-883f-0016d3cca427
+```
+
+When KotlinX Serialization support is included:
+```kotlin
+@Serializable data class Sample(
+  @Serializable(with = UUIDSerializer::class) val uuid: Uuid,
+)
+
+val sample = Sample(uuid = uuid4())
+println(Json.encodeToString(Sample.serializer(), uuid.toString()))
+// {"uuid": "1b4e28ba-2fa1-11d2-883f-0016d3cca427"}
 ```
 
 #### "Zero-overhead" abstraction
