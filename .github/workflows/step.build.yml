@@ -88,6 +88,7 @@ jobs:
     name: CodeQL
     needs: [build]
     permissions:
+      actions: read
       id-token: write
       contents: read
       security-events: write
