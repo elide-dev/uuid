@@ -141,6 +141,17 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/reports/kover/report.xml
 
+  ## Checks: CodeQL
+  codeq:
+    name: CodeQL
+    needs: [build]
+    permissions:
+      id-token: write
+      contents: read
+      security-events: write
+      pull-requests: read
+    uses: ./.github/workflows/codeql.ci.yml
+
   ## Report: Provenance
   provenance:
     name: Provenance
