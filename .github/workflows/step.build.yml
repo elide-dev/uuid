@@ -82,3 +82,4 @@ jobs:
       flags: "-PVERSION=1.0-SNAPSHOT --scan --no-daemon --warning-mode=none --dependency-verification=lenient -Pci=true ${{ inputs.flags }}"
       outputs: "./subprojects/uuid-core/build/libs/*.jar"
       reports_path: "./build/reports"
+
