@@ -1,10 +1,10 @@
 public final class UUIDSerializer : kotlinx/serialization/KSerializer {
 	public static final field INSTANCE LUUIDSerializer;
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/elide/uuid/Uuid;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize-sfeqkRg (Lkotlinx/serialization/encoding/Decoder;)Lkotlin/Pair;
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/elide/uuid/Uuid;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize-0nj7AhU (Lkotlinx/serialization/encoding/Encoder;Lkotlin/Pair;)V
 }
 
 public final class UUIDSerializer$SerializationMode : java/lang/Enum, UUIDSerializer$UUIDCodec {
@@ -18,8 +18,8 @@ public final class UUIDSerializer$SerializationMode : java/lang/Enum, UUIDSerial
 }
 
 public abstract interface class UUIDSerializer$UUIDCodec {
-	public abstract fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/elide/uuid/Uuid;
+	public abstract fun deserialize-sfeqkRg (Lkotlinx/serialization/encoding/Decoder;)Lkotlin/Pair;
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public abstract fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/elide/uuid/Uuid;)V
+	public abstract fun serialize-0nj7AhU (Lkotlinx/serialization/encoding/Encoder;Lkotlin/Pair;)V
 }
 
