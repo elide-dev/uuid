@@ -148,7 +148,9 @@ val preMerge: TaskProvider<Task> by tasks.registering {
 rootProject.plugins.withType(NodeJsRootPlugin::class.java) {
   rootProject.the<NodeJsRootExtension>().download = true
   rootProject.the<NodeJsRootExtension>().version = nodeVersion
-  rootProject.the<NodeJsRootExtension>().downloadBaseUrl = "https://nodejs.org/download/v8-canary"
+  if (nodeVersion.contains("canary")) {
+    rootProject.the<NodeJsRootExtension>().downloadBaseUrl = "https://nodejs.org/download/v8-canary"
+  }
 }
 rootProject.plugins.withType(YarnPlugin::class.java) {
   rootProject.the<YarnRootExtension>().yarnLockMismatchReport = YarnLockMismatchReport.WARNING
