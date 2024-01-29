@@ -270,7 +270,7 @@ publishing {
 
   publications.withType<MavenPublication> {
     artifact(javadocsJar)
-    artifactId = "elide-uuid-kotlinx"
+    artifactId = "elide-$artifactId"
     groupId = GROUP
 
     pom {
