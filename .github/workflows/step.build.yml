@@ -87,6 +87,7 @@ jobs:
   codeql:
     name: CodeQL
     needs: [build]
+    if: false  # disabled until kotlin support catches up
     permissions:
       actions: read
       id-token: write
