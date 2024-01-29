@@ -167,7 +167,6 @@ kotlin {
 
   androidNativeX86()
   androidNativeX64()
-  androidNativeArm32()
   androidNativeArm64()
 
   mingwX64 {
@@ -412,12 +411,11 @@ publishing {
 
   publications.withType<MavenPublication> {
     artifact(javadocsJar)
-    artifactId = artifactId.replace("uuid", "elide-uuid")
+    artifactId = "elide-uuid"
+    groupId = GROUP
 
     pom {
       name = "Elide UUID"
-      artifactId = "uuid"
-      groupId = GROUP
       url = "https://elide.dev"
       description = "UUID tools for Kotlin Multiplatform."
 
