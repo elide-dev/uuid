@@ -63,7 +63,7 @@ permissions:
 jobs:
   build:
     name: "Compile and Test"
-    uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@gradle-outputs
+    uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@main
     secrets: inherit
     permissions:
       actions: "read"
