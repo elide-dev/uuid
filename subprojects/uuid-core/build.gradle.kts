@@ -168,6 +168,7 @@ kotlin {
 
   androidNativeX86()
   androidNativeX64()
+  androidNativeArm32()
   androidNativeArm64()
 
   mingwX64 {
@@ -259,6 +260,8 @@ kotlin {
     val androidNativeX86Test by getting { dependsOn(nix32Test) }
     val androidNativeX64Main by getting { dependsOn(nix64Main) }
     val androidNativeX64Test by getting { dependsOn(nix64Test) }
+    val androidNativeArm32Main by getting { dependsOn(nix32Main) }
+    val androidNativeArm32Test by getting { dependsOn(nix32Test) }
     val androidNativeArm64Main by getting { dependsOn(nix64Main) }
     val androidNativeArm64Test by getting { dependsOn(nix64Test) }
   }

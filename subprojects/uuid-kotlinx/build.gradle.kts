@@ -156,6 +156,7 @@ kotlin {
 
   androidNativeX86()
   androidNativeX64()
+  androidNativeArm32()
   androidNativeArm64()
 
   mingwX64 {
