@@ -84,17 +84,6 @@ jobs:
       push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       provenance: ${{ matrix.provenance }}
 
-  codeql:
-    name: "Analysis: CodeQL"
-    needs: ["build"]
-    uses: ./.github/workflows/codeql.ci.yml
-    secrets: inherit
-    with: {}
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
   qodana:
     name: "Analysis: Qodana"
     needs: ["build"]
