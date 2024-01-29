@@ -28,6 +28,7 @@ K/N UUID. This brings a UUID that matches UUIDs on various platforms:
 - Tested on all platforms, and against macOS/iOS UUID to verify correctness
 - Aggressively optimized for performance and safety
 - Updated for new versions of Kotlin
+- Zero dependencies (not even on `stdlib`)
 - 🆕 All Kotlin targets, including WASM/WASI and Android/Native
 - 🆕 Serializable on JVM
 - 🆕 Serializable with KotlinX
@@ -65,6 +66,9 @@ This library is designed to offer a compile-time option for dealing with UUIDs; 
 `Pair<Long, Long>` to minimize allocations, and the main `Uuid` class is a `@JvmInline value class`.
 
 Thus, your UUIDs are strictly typed and validated but also remain very lightweight.
+
+The main UUID library uses exactly zero dependencies, and even omits a `stdlib` dependency by default. You must bring
+your own before shipping a target with this library.
 
 #### Serialization
 
