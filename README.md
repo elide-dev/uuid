@@ -28,7 +28,7 @@ K/N UUID. This brings a UUID that matches UUIDs on various platforms:
 - Tested on all platforms, and against macOS/iOS UUID to verify correctness
 - Aggressively optimized for performance and safety
 - Updated for new versions of Kotlin
-- Zero dependencies (not even on `stdlib`)
+- Zero dependencies (only `stdlib`)
 - 🆕 All Kotlin targets, including WASM/WASI and Android/Native
 - 🆕 Serializable on JVM
 - 🆕 Serializable with KotlinX

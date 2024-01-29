@@ -177,7 +177,7 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        // Nothing at all.
+        // Nothing.
       }
     }
     val commonTest by getting {
