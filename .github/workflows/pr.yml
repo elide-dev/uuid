@@ -56,15 +56,15 @@ jobs:
             gvm: ${{ vars.GVM_VERSION }}
             java: ${{ vars.JVM_VERSION }}
             provenance: true
-#          - runner: windows-latest
-#            flags: "--no-configuration-cache"
-#            os: "windows"
-#            label: "Windows"
-#            experimental: false
-#            coverage: true
-#            gvm: ${{ vars.GVM_VERSION }}
-#            java: ${{ vars.JVM_VERSION }}
-#            provenance: false
+          - runner: windows-latest
+            flags: "--no-configuration-cache -PnodeVersion=21.6.0 -x wasmJsNodeTest -x wasmJsBrowserTest -x wasmJsTest -x wasmWasiTest -x wasmWasiNodeTest"
+            os: "windows"
+            label: "Windows"
+            experimental: false
+            coverage: true
+            gvm: ${{ vars.GVM_VERSION }}
+            java: ${{ vars.JVM_VERSION }}
+            provenance: false
 
     uses: ./.github/workflows/step.build.yml
     secrets: inherit
