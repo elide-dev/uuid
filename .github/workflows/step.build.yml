@@ -97,7 +97,7 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: "Build and Test"
-        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
+        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2.12.0
         id: gradlebuild
         continue-on-error: ${{ inputs.experimental }}
         with:
