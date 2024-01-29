@@ -1,30 +1,38 @@
 public final class dev/elide/uuid/NamebasedKt {
-	public static final fun uuid3Of (Ldev/elide/uuid/Uuid;Ljava/lang/String;)Ldev/elide/uuid/Uuid;
-	public static final fun uuid5Of (Ldev/elide/uuid/Uuid;Ljava/lang/String;)Ldev/elide/uuid/Uuid;
+	public static final fun uuid3Of-iuGZJlU (Lkotlin/Pair;Ljava/lang/String;)Lkotlin/Pair;
+	public static final fun uuid5Of-iuGZJlU (Lkotlin/Pair;Ljava/lang/String;)Lkotlin/Pair;
 }
 
 public final class dev/elide/uuid/Uuid : java/io/Serializable, java/lang/Comparable {
 	public static final field Companion Ldev/elide/uuid/Uuid$Companion;
 	public static final field serialVersionUID J
-	public fun <init> (JJ)V
-	public synthetic fun <init> (Lkotlin/Pair;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun compareTo (Ldev/elide/uuid/Uuid;)I
+	public static final synthetic fun box-impl (Lkotlin/Pair;)Ldev/elide/uuid/Uuid;
 	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun compareTo-Y8gR1HI (Lkotlin/Pair;)I
+	public static fun compareTo-Y8gR1HI (Lkotlin/Pair;Lkotlin/Pair;)I
+	public static fun constructor-impl (JJ)Lkotlin/Pair;
+	public static fun constructor-impl (Lkotlin/Pair;)Lkotlin/Pair;
 	public fun equals (Ljava/lang/Object;)Z
-	public static final fun from (Ljava/util/UUID;)Ldev/elide/uuid/Uuid;
-	public final fun getJavaUuid ()Ljava/util/UUID;
-	public final fun getLeastSignificantBits ()J
-	public final fun getMostSignificantBits ()J
+	public static fun equals-impl (Lkotlin/Pair;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lkotlin/Pair;Lkotlin/Pair;)Z
+	public static final fun from-sfeqkRg (Ljava/util/UUID;)Lkotlin/Pair;
+	public static final fun getJavaUuid-impl (Lkotlin/Pair;)Ljava/util/UUID;
+	public static final fun getLeastSignificantBits-impl (Lkotlin/Pair;)J
+	public static final fun getMostSignificantBits-impl (Lkotlin/Pair;)J
+	public final fun getPair ()Lkotlin/Pair;
 	public fun hashCode ()I
-	public static final fun of (JJ)Ldev/elide/uuid/Uuid;
-	public static final fun randomUUID ()Ldev/elide/uuid/Uuid;
+	public static fun hashCode-impl (Lkotlin/Pair;)I
+	public static final fun of-WgIM0QA (JJ)Lkotlin/Pair;
+	public static final fun randomUUID-GxO8ZYU ()Lkotlin/Pair;
 	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lkotlin/Pair;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lkotlin/Pair;
 }
 
 public final class dev/elide/uuid/Uuid$Companion {
-	public final fun from (Ljava/util/UUID;)Ldev/elide/uuid/Uuid;
-	public final fun of (JJ)Ldev/elide/uuid/Uuid;
-	public final fun randomUUID ()Ldev/elide/uuid/Uuid;
+	public final fun from-sfeqkRg (Ljava/util/UUID;)Lkotlin/Pair;
+	public final fun of-WgIM0QA (JJ)Lkotlin/Pair;
+	public final fun randomUUID-GxO8ZYU ()Lkotlin/Pair;
 }
 
 public abstract interface class dev/elide/uuid/UuidHasher {
@@ -34,15 +42,15 @@ public abstract interface class dev/elide/uuid/UuidHasher {
 }
 
 public final class dev/elide/uuid/UuidKt {
-	public static final fun getBytes (Ldev/elide/uuid/Uuid;)[B
-	public static final fun getVariant (Ldev/elide/uuid/Uuid;)I
-	public static final fun getVersion (Ldev/elide/uuid/Uuid;)I
-	public static final fun uuid4 ()Ldev/elide/uuid/Uuid;
-	public static final fun uuidFrom (Ljava/lang/String;)Ldev/elide/uuid/Uuid;
-	public static final fun uuidOf ([B)Ldev/elide/uuid/Uuid;
+	public static final fun getBytes-Y8gR1HI (Lkotlin/Pair;)[B
+	public static final fun getVariant-Y8gR1HI (Lkotlin/Pair;)I
+	public static final fun getVersion-Y8gR1HI (Lkotlin/Pair;)I
+	public static final fun uuid4 ()Lkotlin/Pair;
+	public static final fun uuidFrom (Ljava/lang/String;)Lkotlin/Pair;
+	public static final fun uuidOf ([B)Lkotlin/Pair;
 }
 
 public final class dev/elide/uuid/UuidUtil {
-	public static final fun nameBasedUuidOf (Ldev/elide/uuid/Uuid;Ljava/lang/String;Ldev/elide/uuid/UuidHasher;)Ldev/elide/uuid/Uuid;
+	public static final fun nameBasedUuidOf-S7oC60A (Lkotlin/Pair;Ljava/lang/String;Ldev/elide/uuid/UuidHasher;)Lkotlin/Pair;
 }
 
