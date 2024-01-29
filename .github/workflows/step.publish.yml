@@ -158,7 +158,7 @@ jobs:
       - name: "Setup: Checkout"
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: "Setup: Cache"
-        uses: buildjet/cache@e376f15c6ec6dc595375c78633174c7e5f92dc0e # v3
+        uses: buildless/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3
         with:
           key: ${{ runner.os }}-gradle-v2-${{ hashFiles('gradle/libs.versions.toml', '*.lockfile') }}
           restore-keys: |
@@ -178,9 +178,8 @@ jobs:
         with:
           version: '${{ vars.GCLOUD_VERSION }}'
       - name: "Setup: Zulu 21"
-        uses: buildjet/setup-java@3b5edd4799eb848d92664003cb1e6f74db868f19 # v3
+        uses: buildless/setup-java@3232623d9c428cc5f228a01a2ae8d2d70f79775e # v4.0.0
         with:
-          distribution: 'zulu'
           java-version: '21'
       - name: "Publish (${{ matrix.label }})"
         uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
