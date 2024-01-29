@@ -62,95 +62,19 @@ permissions:
 
 jobs:
   build:
-    runs-on: ${{ inputs.runner }}
-    name: "Compile and Test"
-
+    uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@main
+    secrets: inherit
     permissions:
       contents: "write"
       id-token: "write"
       checks: "write"
       pull-requests: "write"
-
-    outputs:
-      hashes: ${{ steps.hash.outputs.hashes }}
-
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
-        with:
-          egress-policy: audit
-
-      - name: "Setup: Checkout"
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - name: "Setup: Cache"
-        uses: buildjet/cache@e376f15c6ec6dc595375c78633174c7e5f92dc0e # v3
-        with:
-          key: ${{ runner.os }}-gradle-v2-${{ hashFiles('gradle/libs.versions.toml', '*.lockfile') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-v2-
-          path: |
-            ~/.sonar/cache
-            ~/.konan
-      - name: "Setup: Zulu 21"
-        uses: buildjet/setup-java@3b5edd4799eb848d92664003cb1e6f74db868f19 # v3
-        with:
-          distribution: 'zulu'
-          java-version: '21'
-      - name: "Build and Test"
-        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
-        id: gradlebuild
-        continue-on-error: ${{ inputs.experimental }}
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta' }}
-          gradle-version: wrapper
-          gradle-home-cache-cleanup: true
-          dependency-graph: generate-and-submit
-          gradle-home-cache-excludes: |
-            caches/build-cache-1
-            caches/keyrings
-          arguments: |
-            preMerge
-            apiCheck
-            detekt
-            -PVERSION=1.0-SNAPSHOT
-            --scan
-            --no-daemon
-            --warning-mode=none
-            --dependency-verification=lenient
-            -Pci=true
-            ${{ inputs.flags }}
-      - name: "Build: Provenance Subject"
-        id: hash
-        if: inputs.provenance
-        run: |
-          echo "hashes=$(sha256sum ./build/libs/* | base64 -w0)" >> "$GITHUB_OUTPUT"
-      - name: "Analysis: Build Reports"
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-        if: failure() || success()
-        with:
-          name: reports
-          path: |
-            build/api/
-            build/reports/
-            build/spdx/
-            build/test-results/
-      - name: "Report: Codecov (Server)"
-        if: inputs.coverage
-        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./build/reports/kover/report.xml
-
-  ## Report: Provenance
-  provenance:
-    name: Provenance
-    needs: [build]
-    if: inputs.provenance
-    permissions:
-      actions: read
-      id-token: write
-      contents: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
     with:
-      base64-subjects: "${{ needs.build.outputs.hashes }}"
-      upload-assets: true
+      label: "Compile and Test (${{ inputs.label }})"
+      runner: ${{ inputs.runner }}
+      checks: true
+      coverage: ${{ inputs.coverage }}
+      provenance: ${{ inputs.provenance }}
+      jvm: ${{ inputs.java }}
+      action: "preMerge allTests apiCheck detekt"
+      flags: "-PVERSION=1.0-SNAPSHOT --scan --no-daemon --warning-mode=none --dependency-verification=lenient -Pci=true ${{ inputs.flags }}"
