@@ -1,0 +1,48 @@
+public final class dev/elide/uuid/NamebasedKt {
+	public static final fun uuid3Of (Ldev/elide/uuid/Uuid;Ljava/lang/String;)Ldev/elide/uuid/Uuid;
+	public static final fun uuid5Of (Ldev/elide/uuid/Uuid;Ljava/lang/String;)Ldev/elide/uuid/Uuid;
+}
+
+public final class dev/elide/uuid/Uuid : java/io/Serializable, java/lang/Comparable {
+	public static final field Companion Ldev/elide/uuid/Uuid$Companion;
+	public static final field serialVersionUID J
+	public fun <init> (JJ)V
+	public synthetic fun <init> (Lkotlin/Pair;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun compareTo (Ldev/elide/uuid/Uuid;)I
+	public synthetic fun compareTo (Ljava/lang/Object;)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static final fun from (Ljava/util/UUID;)Ldev/elide/uuid/Uuid;
+	public final fun getJavaUuid ()Ljava/util/UUID;
+	public final fun getLeastSignificantBits ()J
+	public final fun getMostSignificantBits ()J
+	public fun hashCode ()I
+	public static final fun of (JJ)Ldev/elide/uuid/Uuid;
+	public static final fun randomUUID ()Ldev/elide/uuid/Uuid;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/elide/uuid/Uuid$Companion {
+	public final fun from (Ljava/util/UUID;)Ldev/elide/uuid/Uuid;
+	public final fun of (JJ)Ldev/elide/uuid/Uuid;
+	public final fun randomUUID ()Ldev/elide/uuid/Uuid;
+}
+
+public abstract interface class dev/elide/uuid/UuidHasher {
+	public abstract fun digest ()[B
+	public abstract fun getVersion ()I
+	public abstract fun update ([B)V
+}
+
+public final class dev/elide/uuid/UuidKt {
+	public static final fun getBytes (Ldev/elide/uuid/Uuid;)[B
+	public static final fun getVariant (Ldev/elide/uuid/Uuid;)I
+	public static final fun getVersion (Ldev/elide/uuid/Uuid;)I
+	public static final fun uuid4 ()Ldev/elide/uuid/Uuid;
+	public static final fun uuidFrom (Ljava/lang/String;)Ldev/elide/uuid/Uuid;
+	public static final fun uuidOf ([B)Ldev/elide/uuid/Uuid;
+}
+
+public final class dev/elide/uuid/UuidUtil {
+	public static final fun nameBasedUuidOf (Ldev/elide/uuid/Uuid;Ljava/lang/String;Ldev/elide/uuid/UuidHasher;)Ldev/elide/uuid/Uuid;
+}
+
