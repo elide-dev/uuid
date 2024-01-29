@@ -103,8 +103,16 @@ tasks.build {
 }
 
 subprojects {
+  apply(plugin = "dev.sigstore.sign")
+  apply(plugin = "org.jetbrains.dokka")
+  apply(plugin = "org.jetbrains.kotlinx.kover")
+  apply(plugin = "org.sonarqube")
+
   tasks.withType(Sign::class) {
     onlyIf { isReleaseBuild && (System.getenv("SIGNING_KEYID") != null) }
+  }
+  if (isReleaseBuild && System.getenv("SIGNING_KEYID")?.ifBlank { null } == null) {
+    error("Cannot run release build without signing key: please define the `SIGNING_KEYID` environment variable")
   }
   tasks.withType(SigstoreSignFilesTask::class) {
     onlyIf { isReleaseBuild }
