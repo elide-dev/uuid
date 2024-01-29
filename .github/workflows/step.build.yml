@@ -83,3 +83,14 @@ jobs:
       outputs: "./subprojects/uuid-core/build/libs/*.jar"
       reports_path: "./build/reports"
 
+  ## Checks: CodeQL
+  codeql:
+    name: CodeQL
+    needs: [build]
+    permissions:
+      id-token: write
+      contents: read
+      security-events: write
+      pull-requests: read
+    uses: ./.github/workflows/codeql.ci.yml
+
