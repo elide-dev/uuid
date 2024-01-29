@@ -464,41 +464,6 @@ afterEvaluate {
   }
 }
 
-val publishMac: TaskProvider<Task> by tasks.registering {
-  dependsOn(
-    "publishIosArm64PublicationToMavenRepository",
-    "publishIosSimulatorArm64PublicationToMavenRepository",
-    "publishIosX64PublicationToMavenRepository",
-    "publishTvosArm64PublicationToMavenRepository",
-    "publishTvosSimulatorArm64PublicationToMavenRepository",
-    "publishTvosX64PublicationToMavenRepository",
-    "publishWatchosArm32PublicationToMavenRepository",
-    "publishWatchosArm64PublicationToMavenRepository",
-    "publishWatchosSimulatorArm64PublicationToMavenRepository",
-    "publishWatchosDeviceArm64PublicationToMavenRepository",
-    "publishWatchosX64PublicationToMavenRepository",
-    "publishMacosArm64PublicationToMavenRepository",
-    "publishMacosX64PublicationToMavenRepository",
-    "publishJvmPublicationToMavenRepository",
-    "publishJsPublicationToMavenRepository",
-    "publishKotlinMultiplatformPublicationToMavenRepository",
-    "publishWasmPublicationToMavenRepository",
-  )
-}
-
-val publishWindows: TaskProvider<Task> by tasks.registering {
-  dependsOn(
-    "publishMingwX64PublicationToMavenRepository",
-  )
-}
-
-val publishLinux: TaskProvider<Task> by tasks.registering {
-  dependsOn(
-    "publishLinuxX64PublicationToMavenRepository",
-    "publishLinuxArm64PublicationToMavenRepository",
-  )
-}
-
 val signingTasks = tasks.withType(Sign::class)
 
 tasks.names.forEach {

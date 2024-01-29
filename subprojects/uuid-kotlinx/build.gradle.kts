@@ -241,3 +241,56 @@ tasks.withType<JavaCompile>().configureEach {
   options.isFork = true
   options.isIncremental = true
 }
+
+val javadocsJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+  dependsOn(tasks.dokkaHtml)
+  archiveClassifier = "javadoc"
+  from(tasks.dokkaHtml.get().outputDirectory)
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/elide-dev/uuid")
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+    maven {
+      name = "ElideDev"
+      url = uri(project.properties["RELEASE_REPOSITORY_URL"] as String)
+    }
+  }
+
+  publications.withType<MavenPublication> {
+    artifact(javadocsJar)
+    artifactId = artifactId.replace("uuid", "elide-uuid")
+
+    pom {
+      name = "Elide UUID"
+      artifactId = "uuid"
+      groupId = GROUP
+      url = "https://elide.dev"
+      description = "UUID tools for Kotlin Multiplatform."
+
+      licenses {
+        license {
+          name = "MIT License"
+          url = "https://github.com/elide-dev/elide/blob/v3/LICENSE"
+        }
+      }
+      developers {
+        developer {
+          id = "sgammon"
+          name = "Sam Gammon"
+          email = "samuel.gammon@gmail.com"
+        }
+      }
+      scm {
+        url = "https://github.com/elide-dev/elide"
+      }
+    }
+  }
+}
