@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.0-Beta3-0.20.0-rc1] - 2024-01-28
+### Changed
+- Coming soon.
+
 ## [0.8.22] - 2023-07-29
 ### Changed
 - Upgrade to Kotlin 1.9.0
