@@ -26,7 +26,6 @@ jobs:
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
           egress-policy: audit
-
       - name: Checkout repository
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Initialize CodeQL
@@ -34,6 +33,25 @@ jobs:
         uses: github/codeql-action/init@c0d1daa7f7e14667747d73a7dbbe8c074bc8bfe2 # v2.22.9
         with:
           config-file: ./.github/codeql/codeql-config.yml
+      - name: "Gradle Build"
+        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
+        id: gradlebuild
+        continue-on-error: ${{ inputs.experimental }}
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta' }}
+          gradle-version: wrapper
+          gradle-home-cache-cleanup: true
+          gradle-home-cache-excludes: |
+            caches/build-cache-1
+            caches/keyrings
+          arguments: |
+            assemble
+            -PVERSION=1.0-SNAPSHOT
+            --scan
+            --no-daemon
+            --warning-mode=none
+            --dependency-verification=lenient
+            -Pci=true
       - name: Perform CodeQL Analysis
         continue-on-error: true
         uses: github/codeql-action/analyze@c0d1daa7f7e14667747d73a7dbbe8c074bc8bfe2 # v2.22.9
