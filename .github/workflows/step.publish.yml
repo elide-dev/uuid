@@ -215,8 +215,10 @@ jobs:
         with:
           name: libraries
           path: |
-            build/libs/
-            build/spdx/
+            build/subprojects/uuid-core/libs/
+            build/subprojects/uuid-core/spdx/
+            build/subprojects/uuid-kotlinx/libs/
+            build/subprojects/uuid-kotlinx/spdx/
       - name: "Artifacts: Reports"
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
         if: failure() || success()
@@ -224,6 +226,8 @@ jobs:
           name: reports
           path: |
             build/reports/
+            build/subprojects/uuid-core/reports/
+            build/subprojects/uuid-kotlinx/reports/
 
   ## Report: Provenance
   provenance:
