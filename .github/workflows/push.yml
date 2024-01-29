@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - README.md
       - ./*.md
+  workflow_dispatch: {}
+  merge_group: {}
 
 env:
   CI: "true"
