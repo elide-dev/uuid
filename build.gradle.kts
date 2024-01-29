@@ -50,6 +50,9 @@ val nodeVersion: String by properties
 val lockDeps: String by properties
 val isReleaseBuild = !VERSION.contains("SNAPSHOT")
 
+group = GROUP
+version = VERSION
+
 detekt {
   parallel = true
   ignoreFailures = true
