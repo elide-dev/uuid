@@ -84,25 +84,6 @@ nexusPublishing {
   }
 }
 
-spdxSbom {
-  targets {
-    create("release") {
-      configurations = listOf("jvmRuntimeClasspath")
-
-      scm {
-        uri = "https://github.com/elide-dev/uuid"
-      }
-
-      document {
-        name = "Elide Multiplatform UUID"
-        namespace = "https://elide.dev/spdx/F9B2EC53-49B0-41C7-A013-55FC4BA6B677"
-        creator = "Person:Sam Gammon"
-        packageSupplier = "Organization:Elide"
-      }
-    }
-  }
-}
-
 tasks.cyclonedxBom {
   setIncludeConfigs(listOf("jvmRuntimeClasspath"))
   setProjectType("library")
@@ -113,7 +94,9 @@ tasks.cyclonedxBom {
 }
 
 tasks.build {
-  finalizedBy("spdxSbomForRelease")
+  if (isReleaseBuild) {
+    finalizedBy(":subprojects:uuid-core:spdxSbomForRelease")
+  }
 }
 
 subprojects {

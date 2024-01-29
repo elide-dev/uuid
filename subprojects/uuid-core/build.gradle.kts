@@ -42,6 +42,7 @@ plugins {
   id(libs.plugins.kover.get().pluginId)
   id(libs.plugins.detekt.get().pluginId)
   id(libs.plugins.kotlinx.benchmark.get().pluginId)
+  id(libs.plugins.spdx.sbom.get().pluginId)
 
   `maven-publish`
   distribution
@@ -176,7 +177,7 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-
+        // Nothing at all.
       }
     }
     val commonTest by getting {
@@ -504,6 +505,25 @@ tasks.names.forEach {
   if (it.startsWith("linkDebug") || (it.startsWith("compileTest"))) {
     tasks.named(it).configure {
       dependsOn(signingTasks)
+    }
+  }
+}
+
+spdxSbom {
+  targets {
+    create("release") {
+      configurations = listOf("jvmRuntimeClasspath")
+
+      scm {
+        uri = "https://github.com/elide-dev/uuid"
+      }
+
+      document {
+        name = "Elide Multiplatform UUID"
+        namespace = "https://elide.dev/spdx/F9B2EC53-49B0-41C7-A013-55FC4BA6B677"
+        creator = "Person:Sam Gammon"
+        packageSupplier = "Organization:Elide"
+      }
     }
   }
 }
