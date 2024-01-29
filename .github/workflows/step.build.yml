@@ -62,7 +62,7 @@ permissions:
 
 jobs:
   build:
-    uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml
+    uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@main
     secrets: inherit
     permissions:
       contents: "write"
