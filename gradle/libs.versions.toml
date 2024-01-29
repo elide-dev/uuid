@@ -1,8 +1,8 @@
 [versions]
 kotlin = "2.0.0-Beta3"
 kover = "0.7.5"
-kotlinx_benchmark = "0.4.10"
-kotlinx_apiValidator = "0.13.2"
+kotlinx-benchmark = "0.4.10"
+kotlinx-apiValidator = "0.13.2"
 ktlint = "0.50.0"
 detekt = "1.23.4"
 sonar = "4.4.1.3373"
@@ -16,7 +16,8 @@ kotlinx-serialization = "1.6.2"
 sigstore = "0.5.0"
 spdx = "0.6.0"
 cyclonedx = "1.8.2"
-dependency_analysis = "1.29.0"
+jreleaser = "1.10.0"
+dependency-analysis = "1.29.0"
 buildTimeTracker = "4.3.0"
 
 [plugins]
@@ -25,18 +26,19 @@ testlogger = { id = "com.adarshr.test-logger", version.ref = "testlogger" }
 doctor = { id = "com.osacky.doctor", version.ref = "doctor" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-kotlin_multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlinx_benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx_benchmark" }
-kotlinx_apiValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx_apiValidator" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
+kotlinx-apiValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx-apiValidator" }
 sonar = { id = "org.sonarqube", version.ref = "sonar" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-spdx_sbom = { id = "org.spdx.sbom", version.ref = "spdx" }
+spdx-sbom = { id = "org.spdx.sbom", version.ref = "spdx" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
 sigstore = { id = "dev.sigstore.sign", version.ref = "sigstore" }
-dependency_analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency_analysis" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency-analysis" }
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck" }
 versionCatalogUpdate = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdate" }
 buildTimeTracker = { id = "com.asarkar.gradle.build-time-tracker", version.ref = "buildTimeTracker" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 
 [libraries]
 ktlint = { group = "com.pinterest", name = "ktlint", version.ref = "ktlint" }
