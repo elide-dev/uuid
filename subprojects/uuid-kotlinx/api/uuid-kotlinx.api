@@ -1,0 +1,25 @@
+public final class UUIDSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE LUUIDSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/elide/uuid/Uuid;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/elide/uuid/Uuid;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class UUIDSerializer$SerializationMode : java/lang/Enum, UUIDSerializer$UUIDCodec {
+	public static final field BINARY LUUIDSerializer$SerializationMode;
+	public static final field STRING LUUIDSerializer$SerializationMode;
+	public static final field STRING_UPPERCASE LUUIDSerializer$SerializationMode;
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)LUUIDSerializer$SerializationMode;
+	public static fun values ()[LUUIDSerializer$SerializationMode;
+}
+
+public abstract interface class UUIDSerializer$UUIDCodec {
+	public abstract fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/elide/uuid/Uuid;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public abstract fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/elide/uuid/Uuid;)V
+}
+

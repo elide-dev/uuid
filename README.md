@@ -18,25 +18,57 @@ K/N UUID. This brings a UUID that matches UUIDs on various platforms:
 
 - iOS/Mac: `NSUUID`
 - Java: `java.util.UUID`
+- Native: Source implementation
 
-### `UUID`
+### Features
 
-- Frozen
-- Thread-safe (thread-safe randomness in native)
 - Adheres to RFC4122
-- Tested
-- Tested against macOS/iOS UUID to verify correctness
-- All Kotlin targets, including WASM/WASI
-- Serializable on JVM
+- Support for `uuid3`, `uuid4`, and `uuid5`
+- Frozen and thread-safe (thread-safe randomness in native)
+- Tested on all platforms, and against macOS/iOS UUID to verify correctness
+- Aggressively optimized for performance and safety
+- Updated for new versions of Kotlin
+- 🆕 All Kotlin targets, including WASM/WASI and Android/Native
+- 🆕 Serializable on JVM
+- 🆕 Serializable with KotlinX
+- 🆕 Zero-overhead model
 
 ### Setup
 
-In your build.gradle(.kts):
+**In your `build.gradle(.kts)`:**
 
-- Add `mavenCentral()` to your repositories
-- Add `implementation "dev.elide:elide-uuid:<version>"` as a dependency in your `commonMain` `sourceSets`
+```kotlin
+dependencies {
+  implementation("dev.elide:uuid:<version>")
+}
+```
 
-This library publishes Gradle module metadata. If you're using Gradle prior to version 6, you should have `enableFeaturePreview("GRADLE_METADATA")` in your settings.gradle(.kts).
+**From an Elide application:**
+```kotlin
+dependencies {
+  implementation(elide.uuid)
+}
+```
+
+### Usage
+
+From any Kotlin source set:
+```kotlin
+val uuid = uuid4()
+println(uuid.toString())
+// 1b4e28ba-2fa1-11d2-883f-0016d3cca427
+```
+
+#### "Zero-overhead" abstraction
+
+This library is designed to offer a compile-time option for dealing with UUIDs; internally, UUIDs are stored as a simple
+`Pair<Long, Long>` to minimize allocations, and the main `Uuid` class is a `@JvmInline value class`.
+
+Thus, your UUIDs are strictly typed and validated but also remain very lightweight.
+
+#### Serialization
+
+Both JVM serialization and KotlinX serialization are supported out of the box.
 
 ### Contributing
 
