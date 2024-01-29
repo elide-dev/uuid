@@ -62,6 +62,7 @@ permissions:
 
 jobs:
   build:
+    name: "Compile and Test"
     uses: elide-dev/build-infra/.github/workflows/jvm.gradle.yml@main
     secrets: inherit
     permissions:
@@ -71,7 +72,7 @@ jobs:
       checks: "write"
       pull-requests: "write"
     with:
-      label: "Compile and Test (${{ inputs.label }})"
+      label: ${{ inputs.label }}
       runner: ${{ inputs.runner }}
       checks: true
       coverage: ${{ inputs.coverage }}
