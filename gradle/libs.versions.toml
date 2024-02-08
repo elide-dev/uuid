@@ -2,7 +2,7 @@
 kotlin = "2.0.0-Beta3"
 kover = "0.7.5"
 kotlinx-benchmark = "0.4.10"
-kotlinx-apiValidator = "0.13.2"
+kotlinx-apiValidator = "0.14.0"
 ktlint = "0.51.0-FINAL"
 detekt = "1.23.4"
 sonar = "4.4.1.3373"
