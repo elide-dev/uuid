@@ -32,7 +32,7 @@ jobs:
         with:
           config-file: ./.github/codeql/codeql-config.yml
       - name: "Gradle Build"
-        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
+        uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1 # v3.2.1
         id: gradlebuild
         continue-on-error: ${{ inputs.experimental }}
         with:
