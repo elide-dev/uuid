@@ -27,7 +27,7 @@ on:
       provenance:
         required: false
         type: boolean
-        default: true
+        default: false
       push:
         required: false
         type: boolean
