@@ -230,6 +230,7 @@ jobs:
 
   ## Report: Provenance
   provenance:
+    if: false
     name: Provenance
     needs: [publish]
     permissions:
