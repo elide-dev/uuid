@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.0-RC2"
+kotlin = "2.0.0-RC3"
 kover = "0.7.5"
 kotlinx_benchmark = "0.4.10"
 kotlinx_apiValidator = "0.14.0"
