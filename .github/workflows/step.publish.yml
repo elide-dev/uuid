@@ -182,7 +182,7 @@ jobs:
         with:
           java-version: '21'
       - name: "Publish (${{ matrix.label }})"
-        uses: gradle/gradle-build-action@8baac4c8ef753599f92eeb509c246d09d6250fa6 # v3.3.0
+        uses: gradle/gradle-build-action@db35f2304698ac6ff98958322dfd3db0a5da9fdf # v3.4.0
         id: publish
         with:
           cache-read-only: true
