@@ -12,7 +12,7 @@ def getReleaseRepositoryUrl() {
 
 def getSnapshotRepositoryUrl() {
   return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL :
-      'gcs://elide-snapshots/repository/v3'
+      's3://elide-maven'
 }
 
 def getRepositoryUsername() {

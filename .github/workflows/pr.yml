@@ -112,7 +112,7 @@ jobs:
       SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
     with:
       version: 1.0-SNAPSHOT
-      repository: gcs://elide-snapshots/repository/v3
+      repository: s3://elide-maven
       logLevel: info
       snapshot: true
       release: false

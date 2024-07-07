@@ -12,7 +12,7 @@ on:
         description: "Target repository"
         required: false
         type: string
-        default: gcs://elide-snapshots/repository/v3
+        default: s3://elide-maven
       logLevel:
         description: "Logging level"
         required: true
@@ -68,7 +68,7 @@ on:
       repository:
         required: false
         type: string
-        default: gcs://elide-snapshots/repository/v3
+        default: s3://elide-maven
       snapshot:
         required: false
         type: boolean

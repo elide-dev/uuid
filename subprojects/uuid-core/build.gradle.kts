@@ -280,7 +280,7 @@ kotlin {
       kotlinOptions {
         apiVersion = kotlinLanguage
         languageVersion = kotlinLanguage
-        allWarningsAsErrors = false
+        allWarningsAsErrors = true
         freeCompilerArgs = freeCompilerArgs.plus(kotlinCompilerArgs).toSortedSet().toList()
 
         when (this) {
