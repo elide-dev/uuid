@@ -36,4 +36,4 @@ jobs:
           fetch-depth: 0
       - name: "Qodana Scan"
         continue-on-error: true
-        uses: JetBrains/qodana-action@32840fdb87f8dd110e0a6b09323c7142b667b25d # v2024.1.5
+        uses: JetBrains/qodana-action@84494be4d1a2f64ec1c4bfdf475406e246e34672 # v2024.2.3
