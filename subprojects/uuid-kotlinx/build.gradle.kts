@@ -106,7 +106,6 @@ kotlin {
       kotlinOptions {
         sourceMap = true
         moduleKind = "umd"
-        metaInfo = true
       }
     }
     browser()
@@ -207,7 +206,7 @@ kotlin {
           is KotlinJsOptions -> {
             sourceMap = true
             moduleKind = "umd"
-            metaInfo = true
+
           }
         }
       }
