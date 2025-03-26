@@ -17,7 +17,7 @@ sigstore = "1.2.0"
 spdx = "0.8.0"
 cyclonedx = "1.10.0"
 jreleaser = "1.15.0"
-dependency-analysis = "2.6.1"
+dependency-analysis = "2.13.2"
 buildTimeTracker = "4.3.0"
 
 [plugins]
